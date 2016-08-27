@@ -1,4 +1,4 @@
-Terrain = {
+Map = {
     ['mode'] = 1,
     ['width'] = 10,
     ['origin'] = {
@@ -15,21 +15,26 @@ Terrain = {
     ['data'] = {},
 }
 
-Terrain.__index = Terrain
+Map.__index = Map
 
 ZOOM_MIN = 10
 ZOOM_MAX = 30
 
-function Terrain.create(x, y, wood, stone, iron)
+function Map.create(x, y, wood, stone, iron)
     local terrain = {}
-    setmetatable(terrain, Terrain)
+    setmetatable(terrain, Map)
 
     terrain.width = x
     terrain.height = y
 
     for i = 1, x * y, 1 do
+        local height = 0
+        if math.random() > .9 then
+            height = 1
+        end
+
         local spec = {
-            ['altitude'] = 0,
+            ['height'] = height,
             ['iron'] = 0,
             ['stone'] = 0
         }
@@ -42,37 +47,43 @@ function Terrain.create(x, y, wood, stone, iron)
     return terrain
 end
 
-function Terrain:update_altitude ()
+function Map:update_altitude ()
 end
 
-function Terrain:update_iron ()
+function Map:update_iron ()
 end
 
-function Terrain:update_wood ()
+function Map:update_wood ()
 end
 
-function Terrain:update_stone ()
+function Map:update_stone ()
 end
 
-function Terrain:is_mouse_over (x, y)
+function Map:is_mouse_over (x, y)
     return true
 end
 
-function Terrain:mouse_moved (x, y, dx, dy)
+function Map:mouse_moved (x, y, dx, dy)
+    if current_action == 'none' then
+        self:move_terrain(dx, dy)
+    elseif current_action == 'aqueduc' then
+    end
+    self:set_active_tile(x, y)
+end
+
+function Map:move_terrain(dx, dy)
     if mousedown then
         self:move_origin(dx, dy)
-    else
-        self:set_active_tile(x, y)
     end
 end
 
-function Terrain:wheel_moved (x, y)
+function Map:wheel_moved (x, y)
     self.zoom = self.zoom + y
     if self.zoom < ZOOM_MIN then self.zoom = ZOOM_MIN end
     if self.zoom > ZOOM_MAX then self.zoom = ZOOM_MAX end
 end
 
-function Terrain:set_active_tile (x, y)
+function Map:set_active_tile (x, y)
     local x2 = math.floor((x - self.origin.x) / self.zoom)
     local y2 = math.floor((y - self.origin.y) / self.zoom)
     self.active.x = x2
@@ -80,7 +91,7 @@ function Terrain:set_active_tile (x, y)
     self.active.hover = x2 < self.width and x2 >= 0 and y2 < self.height and y2 >= 0
 end
 
-function Terrain:move_origin (dx, dy)
+function Map:move_origin (dx, dy)
     local lower_limit = 20
     self.origin.x = self.origin.x + dx
     self.origin.y = self.origin.y + dy
@@ -92,16 +103,19 @@ function Terrain:move_origin (dx, dy)
     end
 end
 
-function Terrain:draw()
+function Map:draw()
     for x = 0, self.width - 1, 1 do
         local x2 = self.origin.x + x * self.zoom
         for y = 0, self.height - 1, 1 do
             local y2 = self.origin.y + y * self.zoom
-            local index = y * self.width + x
+            local index = y * self.width + x + 1
             if self.active.hover and self.active.x == x and self.active.y == y then
                 love.graphics.setColor(0, 100, 100)
             else
                 love.graphics.setColor(0, 200, 100)
+            end
+            if self.data[index].height == 1 then
+                love.graphics.setColor(200, 0, 0)
             end
             love.graphics.rectangle('fill', x2, y2, self.zoom, self.zoom)
             love.graphics.setColor(255, 255, 255)

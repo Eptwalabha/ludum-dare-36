@@ -1,6 +1,6 @@
 require 'game'
 
-require 'game/terrain'
+require 'game/map'
 require 'game/game_menu'
 
 game_states = {

@@ -1,8 +1,8 @@
 game = {}
 
-terrain = {}
+map = {}
 game_menu = {}
-active = terrain
+active = map
 days_per_tic = 1
 next_tic = 1
 current_action = 'none'
@@ -17,7 +17,7 @@ party = {
 
 function game.enter()
     state = 'game'
-    terrain = Terrain.create(30,30,0,0,0)
+    map = Map.create(30,30,0,0,0)
     next_tic = 1
     game_menu = GameMenu.create()
     love.graphics.setBackgroundColor(0, 0, 0)
@@ -44,7 +44,7 @@ function game.tic()
 end
 
 function game.draw()
-    terrain:draw()
+    map:draw()
     game_menu:draw()
     --mini_map:draw()
     --dialog:draw()
@@ -76,7 +76,7 @@ end
 
 function game.mousemoved (x, y, dx, dy, isTouch)
     if not mousedown then
-        active = terrain
+        active = map
         if game_menu:is_mouse_over(x, y) then
             active = game_menu
         end
