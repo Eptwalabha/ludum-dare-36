@@ -4,21 +4,32 @@ map = {}
 game_menu = {}
 active = map
 days_per_tic = 1
-next_tic = 1
-current_action = 'none'
+tic_duration = 6
+next_tic = tic_duration
+
+cursor = {
+    action = 'none',
+    item = {}
+}
 
 party = {
     gold = 99999,
     stone = 99999,
     iron = 99999,
     wood = 99999,
-    days_left = 10
+    days_left = 100
+}
+
+local item_test = {
+    name = 'lol',
+    image = 'test',
+    size = 3
 }
 
 function game.enter()
     state = 'game'
     map = Map.create(30,30,0,0,0)
-    next_tic = 1
+    next_tic = tic_duration
     game_menu = GameMenu.create()
     love.graphics.setBackgroundColor(0, 0, 0)
 end
@@ -26,7 +37,7 @@ end
 function game.update(dt)
     next_tic = next_tic - dt
     if next_tic < 0 then
-        next_tic = next_tic + 1
+        next_tic = next_tic + tic_duration
         game.tic()
     end
 end
@@ -45,9 +56,17 @@ end
 
 function game.draw()
     map:draw()
+    game.draw_entities()
     game_menu:draw()
     --mini_map:draw()
     --dialog:draw()
+end
+
+function game.draw_entities ()
+    if cursor.action ~= 'none' then
+        local mouse_x, mouse_y = love.mouse.getPosition()
+        map:draw_entity(mouse_x, mouse_y, item_test)
+    end
 end
 
 function game.keypressed(key)
@@ -64,6 +83,21 @@ function game.mousepressed (x, y, button, isTouch)
     mousedown = true
     if active and active.mouse_pressed then
         active:mouse_pressed(x, y, button)
+    end
+
+    if active == map and cursor.action == 'build' then
+        game.build()
+    end
+end
+
+function game.build()
+    if map:add_entity(item_test) then
+        party.gold = party.gold - 1000
+
+        if not love.keyboard.isDown('lctrl') then
+            cursor.action = 'none'
+        end
+    else
     end
 end
 

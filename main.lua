@@ -16,7 +16,8 @@ assets = {
     },
     images = {
         menu = {},
-        icon = {}
+        icon = {},
+        building = {}
     },
     musics = {
     },
@@ -90,6 +91,7 @@ end
 function load_images()
     assets.textures.menu = love.graphics.newImage('assets/menus.png')
     assets.textures.icon = love.graphics.newImage('assets/icons.png')
+    assets.textures.building = love.graphics.newImage('assets/menus.png')
     assets.images.menu.aqueduc = love.graphics.newQuad(0, 0, 32, 32, 131, 32)
     assets.images.menu.building = love.graphics.newQuad(33, 0, 32, 32, 131, 32)
     assets.images.menu.trade = love.graphics.newQuad(66, 0, 32, 32, 131, 32)
@@ -99,4 +101,5 @@ function load_images()
     assets.images.icon.stone = love.graphics.newQuad(66, 0, 32, 32, 230, 32)
     assets.images.icon.wood = love.graphics.newQuad(99, 0, 32, 32, 230, 32)
     assets.images.icon.days_left = love.graphics.newQuad(132, 0, 32, 32, 230, 32)
+    assets.images.building.test = love.graphics.newQuad(0, 0, 32, 32, 131, 32)
 end

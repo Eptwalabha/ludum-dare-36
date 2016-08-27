@@ -29,7 +29,7 @@ local ui_items = {
         [2] = {
             name = 'building',
             active = true,
-            selected = true
+            selected = false
         },
         [3] = {
             name = 'trade',
@@ -128,9 +128,9 @@ function GameMenu:mouse_released (x, y, button)
     if button == 1 then
         local action = GameMenu.get_action(x, y)
         if action then
-            current_action = ui_items.bottom[action].name
+            cursor.action = ui_items.bottom[action].name
         else
-            current_action = 'none'
+            cursor.action = 'none'
         end
         for i = 1, #ui_items.bottom, 1 do
             ui_items.bottom[i].selected = (i == action)
