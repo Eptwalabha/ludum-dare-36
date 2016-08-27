@@ -84,9 +84,13 @@ end
 function Terrain:move_origin (dx, dy)
     local lower_limit = 20
     self.origin.x = self.origin.x + dx
-    if self.origin.x > lower_limit then self.origin.x = lower_limit end
     self.origin.y = self.origin.y + dy
-    if self.origin.y > lower_limit + 30 then self.origin.y = lower_limit + 30 end
+    if self.origin.x > lower_limit then
+        self.origin.x = lower_limit
+    end
+    if self.origin.y > lower_limit + TOP_HEIGHT then
+        self.origin.y = lower_limit + TOP_HEIGHT
+    end
 end
 
 function Terrain:draw()

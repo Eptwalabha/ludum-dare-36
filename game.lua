@@ -3,15 +3,38 @@ game = {}
 terrain = {}
 game_menu = {}
 active = terrain
+days_per_tic = 1
+next_tic = 1
+
+party = {
+    gold = 0,
+    stone = 0,
+    iron = 0,
+    wood = 0,
+    day_left = 600
+}
 
 function game.enter()
     state = 'game'
     terrain = Terrain.create(30,30,0,0,0)
+    next_tic = 1
     game_menu = GameMenu.create()
     love.graphics.setBackgroundColor(0, 0, 0)
 end
 
 function game.update(dt)
+    next_tic = next_tic - dt
+    if next_tic < 0 then
+        next_tic = next_tic + 1
+        game.tic()
+    end
+end
+
+function game.tic()
+    local nbr = days_per_tic
+    for day = 1, nbr, 1 do
+
+    end
 end
 
 function game.draw()

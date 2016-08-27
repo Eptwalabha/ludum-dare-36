@@ -3,7 +3,8 @@ GameMenu = {
 
 GameMenu.__index = GameMenu
 
-BOTTOM = 84
+TOP_HEIGHT = 32
+BOTTOM_HEIGHT = 84
 
 function GameMenu.create ()
     local game_menu = {}
@@ -16,13 +17,13 @@ end
 
 function GameMenu:draw()
 
-    local h = GAME_H - BOTTOM
+    local h = GAME_H - BOTTOM_HEIGHT
     love.graphics.setColor(100, 100, 100)
-    love.graphics.rectangle('fill', 0, 0, GAME_W, 30)
+    love.graphics.rectangle('fill', 0, 0, GAME_W, TOP_HEIGHT)
     love.graphics.rectangle('fill', 0, h, GAME_W, GAME_H)
-    love.graphics.setColor(50, 50, 50)
-    love.graphics.rectangle('line', 0, 0, GAME_W, 30)
-    love.graphics.rectangle('line', 0, h, GAME_W, GAME_H)
+    love.graphics.setColor(200, 200, 200)
+    love.graphics.line(0, TOP_HEIGHT, GAME_W, TOP_HEIGHT)
+    love.graphics.line(0, h, GAME_W, h)
     love.graphics.setColor(255, 255, 255)
     love.graphics.draw(assets.textures.menu,
                        assets.images.menu.aqueduc, 10, h + 10, 0, 2, 2)
@@ -41,11 +42,11 @@ function GameMenu:is_mouse_over (x, y)
 end
 
 function GameMenu:is_mouse_over_top_menu (x, y)
-    return x >= 0 and x <= GAME_W and y >= 0 and y <= 30
+    return x >= 0 and x <= GAME_W and y >= 0 and y <= TOP_HEIGHT
 end
 
 function GameMenu:is_mouse_over_bottom_menu (x, y)
-    return x >= 0 and x <= GAME_W and y >= GAME_H - BOTTOM and y <= GAME_H
+    return x >= 0 and x <= GAME_W and y >= GAME_H - BOTTOM_HEIGHT and y <= GAME_H
 end
 
 function GameMenu:is_mouse_over_sub_menu (x, y)
