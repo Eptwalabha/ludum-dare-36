@@ -5,6 +5,7 @@ game_menu = {}
 active = terrain
 days_per_tic = 1
 next_tic = 1
+current_action = 'none'
 
 party = {
     gold = 0,
@@ -56,21 +57,28 @@ end
 
 function game.mousepressed (x, y, button, isTouch)
     mousedown = true
+    if active and active.mouse_pressed then
+        active:mouse_pressed(x, y, button)
+    end
 end
 
 function game.mousereleased (x, y, button, isTouch)
     mousedown = false
+    if active and active.mouse_released then
+        active:mouse_released(x, y, button)
+    end
 end
 
 function game.mousemoved (x, y, dx, dy, isTouch)
-
     if not mousedown then
         active = terrain
         if game_menu:is_mouse_over(x, y) then
             active = game_menu
         end
     end
-    active:mouse_moved(x, y, dx, dy)
+    if active and active.mouse_moved then
+        active:mouse_moved(x, y, dx, dy)
+    end
 end
 
 function game.wheelmoved (x, y)

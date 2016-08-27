@@ -1,7 +1,31 @@
-GameMenu = {
-}
+GameMenu = {}
 
 GameMenu.__index = GameMenu
+
+local ui_items = {
+    bottom = {
+        [1] = {
+            name = 'aqueduc',
+            active = true,
+            selected = false
+        },
+        [2] = {
+            name = 'building',
+            active = true,
+            selected = true
+        },
+        [3] = {
+            name = 'trade',
+            active = true,
+            selected = false
+        },
+        [4] = {
+            name = 'discover',
+            active = true,
+            selected = false
+        }
+    }
+}
 
 TOP_HEIGHT = 32
 BOTTOM_HEIGHT = 84
@@ -16,23 +40,36 @@ function GameMenu:update(dt)
 end
 
 function GameMenu:draw()
+    self:draw_ui_top()
+    self:draw_ui_bottom()
+end
 
-    local h = GAME_H - BOTTOM_HEIGHT
+function GameMenu:draw_ui_top ()
     love.graphics.setColor(100, 100, 100)
     love.graphics.rectangle('fill', 0, 0, GAME_W, TOP_HEIGHT)
-    love.graphics.rectangle('fill', 0, h, GAME_W, GAME_H)
     love.graphics.setColor(200, 200, 200)
     love.graphics.line(0, TOP_HEIGHT, GAME_W, TOP_HEIGHT)
+end
+
+function GameMenu:draw_ui_bottom ()
+    local h = GAME_H - BOTTOM_HEIGHT
+    love.graphics.setColor(100, 100, 100)
+    love.graphics.rectangle('fill', 0, h, GAME_W, GAME_H)
+    love.graphics.setColor(200, 200, 200)
     love.graphics.line(0, h, GAME_W, h)
-    love.graphics.setColor(255, 255, 255)
-    love.graphics.draw(assets.textures.menu,
-                       assets.images.menu.aqueduc, 10, h + 10, 0, 2, 2)
-    love.graphics.draw(assets.textures.menu,
-                       assets.images.menu.building, 84, h + 10, 0, 2, 2)
-    love.graphics.draw(assets.textures.menu,
-                       assets.images.menu.trade, 158, h + 10, 0, 2, 2)
-    love.graphics.draw(assets.textures.menu,
-                       assets.images.menu.discover, 168 + 64, h + 10, 0, 2, 2)
+    for i = 1, #ui_items.bottom, 1 do
+        love.graphics.setColor(255, 255, 255)
+        if ui_items.bottom[i].selected then
+            love.graphics.setColor(0, 255, 0)
+        end
+        if not ui_items.bottom[i].active then
+            love.graphics.setColor(50, 50, 50)
+        end
+        local x = 10 + (i - 1) * 10 + (i - 1) * 64
+        love.graphics.draw(assets.textures.menu,
+                           assets.images.menu[ui_items.bottom[i].name],
+                           x, h + 10, 0, 2, 2)
+    end
 end
 
 function GameMenu:is_mouse_over (x, y)
@@ -59,4 +96,30 @@ end
 function GameMenu:wheel_moved (x, y)
 end
 
+function GameMenu:mouse_released (x, y, button)
+    if button == 1 then
+        local action = GameMenu.get_action(x, y)
+        if action then
+            current_action = ui_items.bottom[action].name
+        else
+            current_action = 'none'
+        end
+        for i = 1, #ui_items.bottom, 1 do
+            ui_items.bottom[i].selected = (i == action)
+        end
+    end
+end
 
+function GameMenu.get_action (x, y)
+    if y > GAME_H - BOTTOM_HEIGHT + 10 and y < GAME_H - 10 then
+        for i = 1, #ui_items.bottom, 1 do
+            if ui_items.bottom[i].active then
+                local xm = 10 + (i - 1) * 10 + (i - 1) * 64
+                if x >= xm and x < xm + 64 then
+                    return i
+                end
+            end
+        end
+    end
+    return nil
+end

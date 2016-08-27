@@ -39,7 +39,6 @@ function Terrain.create(x, y, wood, stone, iron)
     terrain:update_iron()
     terrain:update_stone()
     terrain:update_wood()
-    print(#terrain)
     return terrain
 end
 
