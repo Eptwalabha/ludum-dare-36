@@ -3,6 +3,23 @@ GameMenu = {}
 GameMenu.__index = GameMenu
 
 local ui_items = {
+    top = {
+        [1] = {
+            name = 'gold'
+        },
+        [2] = {
+            name = 'stone'
+        },
+        [3] = {
+            name = 'iron'
+        },
+        [4] = {
+            name = 'wood'
+        },
+        [5] = {
+            name = 'days_left'
+        }
+    },
     bottom = {
         [1] = {
             name = 'aqueduc',
@@ -49,6 +66,10 @@ function GameMenu:draw_ui_top ()
     love.graphics.rectangle('fill', 0, 0, GAME_W, TOP_HEIGHT)
     love.graphics.setColor(200, 200, 200)
     love.graphics.line(0, TOP_HEIGHT, GAME_W, TOP_HEIGHT)
+    for i = 1, #ui_items.top, 1 do
+        local x = 10 + (i - 1) * 5 + (i - 1) * 85
+        self:draw_icon_text_at(x, 0, ui_items.top[i].name)
+    end
 end
 
 function GameMenu:draw_ui_bottom ()
@@ -70,6 +91,13 @@ function GameMenu:draw_ui_bottom ()
                            assets.images.menu[ui_items.bottom[i].name],
                            x, h + 10, 0, 2, 2)
     end
+end
+
+function GameMenu:draw_icon_text_at (x, y, icon_name)
+    local text = game.get_text_icon(icon_name)
+    love.graphics.draw(assets.textures.icon,
+                       assets.images.icon[icon_name], x, y)
+    love.graphics.print(text, x + 32, y + 10)
 end
 
 function GameMenu:is_mouse_over (x, y)
