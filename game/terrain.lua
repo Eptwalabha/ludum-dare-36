@@ -17,7 +17,7 @@ Terrain = {
 
 Terrain.__index = Terrain
 
-ZOOM_MIN = 5
+ZOOM_MIN = 10
 ZOOM_MAX = 30
 
 function Terrain.create(x, y, wood, stone, iron)

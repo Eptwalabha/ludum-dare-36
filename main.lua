@@ -88,7 +88,8 @@ end
 
 function load_images()
     assets.textures.menu = love.graphics.newImage('assets/menus.png')
-    assets.images.menu.aqueduc = love.graphics.newQuad(0, 0, 32, 32, 64, 32)
-    assets.images.menu.building = love.graphics.newQuad(33, 0, 32, 32, 64, 32)
-    assets.images.menu.trade = love.graphics.newQuad(0, 0, 32, 32, 64, 32)
+    assets.images.menu.aqueduc = love.graphics.newQuad(0, 0, 32, 32, 131, 32)
+    assets.images.menu.building = love.graphics.newQuad(33, 0, 32, 32, 131, 32)
+    assets.images.menu.trade = love.graphics.newQuad(66, 0, 32, 32, 131, 32)
+    assets.images.menu.discover = love.graphics.newQuad(99, 0, 32, 32, 131, 32)
 end

@@ -29,7 +29,9 @@ function GameMenu:draw()
     love.graphics.draw(assets.textures.menu,
                        assets.images.menu.building, 84, h + 10, 0, 2, 2)
     love.graphics.draw(assets.textures.menu,
-                       assets.images.menu.trade, 94 + 64, h + 10, 0, 2, 2)
+                       assets.images.menu.trade, 158, h + 10, 0, 2, 2)
+    love.graphics.draw(assets.textures.menu,
+                       assets.images.menu.discover, 168 + 64, h + 10, 0, 2, 2)
 end
 
 function GameMenu:is_mouse_over (x, y)
