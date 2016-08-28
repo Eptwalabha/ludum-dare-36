@@ -28,11 +28,17 @@ local item_test = {
 }
 
 items = {}
+local path = {}
 
 function game.enter()
     state = 'game'
+
     map = Map.load_from_file('assets/maps/map_test.png')
-    -- map = Map.create(30,30,0,0,0)
+
+    map.nodes = astar.prepare(map)
+    path = astar.find (1, 1, map.width - 10, map.height -10, map.nodes)
+
+    active = map
     next_tic = tic_duration
     game_menu = GameMenu.create()
     love.graphics.setBackgroundColor(0, 0, 0)
@@ -49,6 +55,8 @@ function game.update(dt)
             party.days_left = 99999
         end
     end
+    local _, x, y = map:get_index(love.mouse.getX(), love.mouse.getY())
+    path = astar.find(1, 1, x, y, map.nodes)
 end
 
 function game.tic()
@@ -66,6 +74,17 @@ end
 function game.draw()
     map:draw(party.buildings)
     game.draw_entities()
+
+    local lines = {}
+    for i, node in ipairs(path) do
+        table.insert(lines, map.origin.x + node.x * map.zoom + map.zoom / 2)
+        table.insert(lines, map.origin.y + node.y * map.zoom + map.zoom / 2)
+    end
+    if #lines >= 4 then
+        love.graphics.setColor(0, 0, 255)
+        love.graphics.line(lines)
+    end
+
     game_menu:draw()
     --mini_map:draw()
     --dialog:draw()
@@ -107,7 +126,7 @@ end
 function game.mousereleased (x, y, button, isTouch)
     mousedown = false
     if active then
-        if active == 'game_menu' then
+        if active == game_menu then
             game_menu:mouse_released(x, y, button)
         end
     end
@@ -169,7 +188,9 @@ function game.mousemoved (x, y, dx, dy, isTouch)
 end
 
 function game.wheelmoved (x, y)
-    active:wheel_moved(x, y)
+    if active and active.wheel_moved then
+        active:wheel_moved(x, y)
+    end
 end
 
 function game.leave()

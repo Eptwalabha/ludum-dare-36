@@ -76,14 +76,20 @@ function Map.create(x, y, wood, stone, iron)
     map.width = x
     map.height = y
 
-    for i = 1, x * y, 1 do
-        local spec = {
-            occupy = (math.random() > 0.9),
-            wood = 0,
-            iron = 0,
-            stone = 0
-        }
-        table.insert(map.data, spec)
+    for i = 0, x - 1, 1 do
+        for j = 0, y - 1, 1 do
+            local spec = {
+                pos = {
+                    x = i,
+                    y = j
+                },
+                occupy = (math.random() > 0.9),
+                wood = 0,
+                iron = 0,
+                stone = 0
+            }
+            table.insert(map.data, spec)
+        end
     end
     map:update_altitude()
     map:update_iron()
@@ -154,7 +160,7 @@ function Map:move_origin (dx, dy)
     end
 end
 
-function Map:draw(buildings)
+function Map:draw (buildings)
     for x = 0, self.width - 1, 1 do
         local x2 = self.origin.x + x * self.zoom
         for y = 0, self.height - 1, 1 do
