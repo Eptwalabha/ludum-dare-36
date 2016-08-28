@@ -31,7 +31,8 @@ items = {}
 
 function game.enter()
     state = 'game'
-    map = Map.create(30,30,0,0,0)
+    map = Map.load_from_file('assets/maps/map_test.png')
+    -- map = Map.create(30,30,0,0,0)
     next_tic = tic_duration
     game_menu = GameMenu.create()
     love.graphics.setBackgroundColor(0, 0, 0)
@@ -117,17 +118,18 @@ function game.update_menu(action)
     cursor.action = 'none'
     if action == 'none' then
         game_menu:deselect_all()
-        map.mode = 1
+        map.mode_mask = false
     elseif action == 'aqueduc' then
         game_menu:select_menu('aqueduc')
     elseif action == 'building' then
         game_menu:select_menu('building')
         if game_menu:is_menu_selected('building') then
-            map.mode = 2
+            map.mode_mask = true
+            map:set_mask(false, true, true)
             cursor.action = 'build'
             cursor.item = item_test
         else
-            map.mode = 1
+            map.mode_mask = false
         end
     elseif action == 'trade' then
         game_menu:select_menu('trade')
@@ -143,7 +145,7 @@ function game.build()
         if not love.keyboard.isDown('lctrl') then
             cursor.action = 'none'
             game_menu:toggle_menu('building')
-            map.mode = 1
+            map.mode_mask = false
         end
         local item = {}
         item.name = item_test.name

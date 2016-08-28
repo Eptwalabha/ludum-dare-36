@@ -1,5 +1,6 @@
 Map = {
-    mode = 1,
+    mode_mask = false,
+    mask = {},
     width = 10,
     origin = {
         x = 0,
@@ -19,6 +20,54 @@ Map.__index = Map
 
 ZOOM_MIN = 10
 ZOOM_MAX = 30
+
+function Map.load_from_file(file)
+    local image = love.image.newImageData(file)
+    local map = {}
+    setmetatable(map, Map)
+    local w, h = image:getDimensions()
+    map.width = w
+    map.height = h
+
+    for y = 1, map.height, 1 do
+        for x = 1, map.width, 1 do
+            local r, g, b = image:getPixel(x - 1, y - 1)
+            table.insert(map.data, Map.get_spec_from_color(r, g, b))
+        end
+    end
+
+    return map
+end
+
+function Map.spec(occupy, wood, iron, stone, mountain)
+    if not mountain then
+        mountain = false
+    end
+    return {
+        occupy = occupy,
+        wood = wood,
+        iron = iron,
+        stone = stone,
+        mountain = mountain
+    }
+end
+
+function Map.get_spec_from_color(r, g, b)
+    if r == 50 and g == 50 and b == 50 then
+        return Map.spec(true, 0, 0, 0, true)
+    elseif r == 100 and g == 100 and b == 100 then
+        return Map.spec(false, 0, 100, 0)
+    elseif r == 0 and b == 0 then
+        if g == 255 then
+            return Map.spec(false, 0, 0, 0)
+        elseif g == 150 then
+            return Map.spec(false, 100, 0, 0)
+        end
+    elseif r == 255 and g == 255 and b == 255 then
+        return Map.spec(false, 0, 0, 100)
+    end
+    return Map.spec(false, 0, 0, 0)
+end
 
 function Map.create(x, y, wood, stone, iron)
     local map = {}
@@ -111,12 +160,13 @@ function Map:draw(buildings)
         for y = 0, self.height - 1, 1 do
             local y2 = self.origin.y + y * self.zoom
             local index = y * self.width + x + 1
-            self:set_color(index)
+            local r, g, b = self:set_color(index)
+            love.graphics.setColor(r, g, b)
             if self.active.hover and self.active.x == x and self.active.y == y then
                 love.graphics.setColor(0, 100, 100)
             end
             love.graphics.rectangle('fill', x2, y2, self.zoom, self.zoom)
-            love.graphics.setColor(255, 255, 255)
+            love.graphics.setColor(255, 255, 255, 50)
             love.graphics.rectangle('line', x2, y2, self.zoom, self.zoom)
         end
     end
@@ -127,20 +177,27 @@ end
 
 function Map:set_color(index)
     local tile = self.data[index]
-    love.graphics.setColor(255, 255, 255)
-    if tile.wood > 1 then
-        love.graphics.setColor(0, 100, 0)
-    elseif tile.iron > 0 then
-        love.graphics.setColor(50, 50, 50)
-    else
-        love.graphics.setColor(0, 200, 100)
+    if self.mode_mask then
+        if tile.mountain or tile.occupy then
+            return 150, 0, 0
+        end
+        if tile.wood ~= 0 and self.mask.wood or
+           tile.iron ~= 0 and self.mask.iron or
+           tile.stone ~= 0 and self.mask.stone then
+           return 150, 0, 0
+       end
     end
 
-    if self.mode == 2 then
-        if tile.occupy then
-            love.graphics.setColor(200, 0, 0)
-        end
+    if tile.wood ~= 0 then
+        return 0, 100, 0
+    elseif tile.iron ~= 0 then
+        return 100, 100, 100
+    elseif tile.stone ~= 0 then
+        return 255, 255, 255
+    elseif tile.mountain then
+        return 50, 50, 50
     end
+    return 0, 200, 100 
 end
 
 function Map:draw_buildings(buildings)
@@ -189,14 +246,22 @@ function Map:draw_entity (mx, my, item)
     end
 end
 
-function Map:is_buildable (index)
+function Map:is_buildable (index, mask)
+    if not mask then mask = self.mask end
     if not index or index < 1 or index > #self.data then
         return false
     end
 
     local spec = self.data[index]
 
-    return not spec.occupy and spec.wood == 0
+    return not spec.occupy and not spec.mountain and
+           not Map.spec_compatible_with_mask(spec, mask)
+end
+
+function Map.spec_compatible_with_mask (spec, mask)
+    return spec.wood > 0 and mask.wood or
+           spec.iron > 0 and mask.iron or
+           spec.stone > 0 and mask.stone
 end
 
 function Map:get_index (mx, my)
@@ -253,4 +318,12 @@ function Map:get_indexes_from_area (x, y, w, h)
         end
     end
     return indexes
+end
+
+function Map:set_mask(wood, iron, stone)
+    self.mask = Map.make_mask(wood, iron, stone)
+end
+
+function Map.make_mask(wood, iron, stone)
+    return { wood = wood, iron = iron, stone = stone }
 end
