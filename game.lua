@@ -13,10 +13,10 @@ cursor = {
 }
 
 party = {
-    gold = 99999,
-    stone = 99999,
-    iron = 99999,
-    wood = 99999,
+    gold = 100,
+    stone = 100,
+    iron = 100,
+    wood = 100,
     days_left = 99999,
     buildings = {}
 }

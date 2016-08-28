@@ -8,7 +8,7 @@ local trading = {
             price = 0
         },
         iron = {
-            amount = 50,
+            amount = 0,
             quotation = 10,
             price = 0
         },
@@ -20,7 +20,7 @@ local trading = {
     },
     buy = {
         stone = {
-            amount = 40,
+            amount = 0,
             quotation = 20,
             price = 0
         },
@@ -37,12 +37,18 @@ local trading = {
     }
 }
 
+local repeat_delay = 0
+
 function trade.enter()
     state = 'trade'
 end
 
 function trade.update(dt)
     trade.update_prices()
+    repeat_delay = repeat_delay - dt
+    if love.mouse.isDown() and repeat_delay <= 0 then
+        trade.check_sliders()
+    end
 end
 
 function trade.draw()
@@ -85,14 +91,14 @@ function trade.draw_icon(x, y, icon, value)
 end
 
 function trade.draw_sliders(x, y)
-    local sell = trading.sell
     local buy = trading.buy
-    trade.draw_slider(x - 290, y, 'stone', sell.stone, 1)
-    trade.draw_slider(x - 290, y + 30, 'iron', sell.iron, 1)
-    trade.draw_slider(x - 290, y + 60, 'wood', sell.wood, 1)
-    trade.draw_slider(x + 10, y, 'stone', buy.stone, -1)
-    trade.draw_slider(x + 10, y + 30, 'iron', buy.iron, -1)
-    trade.draw_slider(x + 10, y + 60, 'wood', buy.wood, -1)
+    local sell = trading.sell
+    trade.draw_slider(x - 290, y, 'stone', buy.stone, -1)
+    trade.draw_slider(x - 290, y + 30, 'iron', buy.iron, -1)
+    trade.draw_slider(x - 290, y + 60, 'wood', buy.wood, -1)
+    trade.draw_slider(x + 10, y, 'stone', sell.stone, 1)
+    trade.draw_slider(x + 10, y + 30, 'iron', sell.iron, 1)
+    trade.draw_slider(x + 10, y + 60, 'wood', sell.wood, 1)
 end
 
 function trade.update_prices()
@@ -147,9 +153,12 @@ function trade.keyreleased(key)
 end
 
 function trade.mousepressed (x, y, button, isTouch)
+    repeat_delay = 0.8
+    trade.check_sliders()
 end
 
 function trade.mousereleased (x, y, button, isTouch)
+    repeat_delay = 0
     if x < 100 or x > GAME_W - 100 or
        y < TOP_HEIGHT + 50 or y > GAME_H - 100 then
         state = 'game'
@@ -188,4 +197,95 @@ function trade.compute_transaction()
     gold = gold + sell.wood.amount * sell.wood.quotation / 10
 
     return iron, stone, wood, gold
+end
+
+function trade.check_sliders()
+    local x, y = love.mouse.getPosition()
+    repeat_delay = repeat_delay + 0.2
+    local xb = GAME_W / 2 - 290 + 50
+    local yb = GAME_H / 2 - 20 - 16
+
+    if x >= xb and x < xb + 32 and y >= yb and y < yb + 32 then
+        trading.buy.stone.amount = trading.buy.stone.amount - 10
+        if trading.buy.stone.amount < 0 then
+            trading.buy.stone.amount = 0
+        end
+    end
+    if x >= xb and x < xb + 32 and y >= yb + 30 and y < yb + 62 then
+        trading.buy.iron.amount = trading.buy.iron.amount - 10
+        if trading.buy.iron.amount < 0 then
+            trading.buy.iron.amount = 0
+        end
+    end
+    if x >= xb and x < xb + 32 and y >= yb + 60 and y < yb + 92 then
+        trading.buy.wood.amount = trading.buy.wood.amount - 10
+        if trading.buy.wood.amount < 0 then
+            trading.buy.wood.amount = 0
+        end
+    end
+    if x >= xb + 90 and x < xb + 122 and y >= yb and y < yb + 32 then
+        trading.buy.stone.amount = trading.buy.stone.amount + 10
+        local _, _, _, gold = trade.compute_transaction()
+        if party.gold + gold < 0 then
+            trading.buy.stone.amount = trading.buy.stone.amount - 10
+        end
+    end
+    if x >= xb + 90 and x < xb + 122 and y >= yb + 30 and y < yb + 62 then
+        trading.buy.iron.amount = trading.buy.iron.amount + 10
+        local _, _, _, gold = trade.compute_transaction()
+        if party.gold + gold < 0 then
+            trading.buy.iron.amount = trading.buy.iron.amount - 10
+        end
+    end
+    if x >= xb + 90 and x < xb + 122 and y >= yb + 60 and y < yb + 92 then
+        trading.buy.wood.amount = trading.buy.wood.amount + 10
+        local _, _, _, gold = trade.compute_transaction()
+        if party.gold + gold < 0 then
+            trading.buy.wood.amount = trading.buy.wood.amount - 10
+        end
+    end
+
+    xb = GAME_W / 2 + 10 + 50
+
+    if x >= xb and x < xb + 32 and y >= yb and y < yb + 32 then
+        trading.sell.stone.amount = trading.sell.stone.amount - 10
+        if trading.sell.stone.amount < 0 then
+            trading.sell.stone.amount = 0
+        end
+    end
+    if x >= xb and x < xb + 32 and y >= yb + 30 and y < yb + 62 then
+        trading.sell.iron.amount = trading.sell.iron.amount - 10
+        if trading.sell.iron.amount < 0 then
+            trading.sell.iron.amount = 0
+        end
+    end
+    if x >= xb and x < xb + 32 and y >= yb + 60 and y < yb + 92 then
+        trading.sell.wood.amount = trading.sell.wood.amount - 10
+        if trading.sell.wood.amount < 0 then
+            trading.sell.wood.amount = 0
+        end
+    end
+    if x >= xb + 90 and x < xb + 122 and y >= yb and y < yb + 32 then
+        trading.sell.stone.amount = trading.sell.stone.amount + 10
+        local _, stone, _, _ = trade.compute_transaction()
+        print(stone)
+        if party.stone + stone < 0 then
+            trading.sell.stone.amount = trading.sell.stone.amount - 10
+        end
+    end
+    if x >= xb + 90 and x < xb + 122 and y >= yb + 30 and y < yb + 62 then
+        trading.sell.iron.amount = trading.sell.iron.amount + 10
+        local iron, _, _, _ = trade.compute_transaction()
+        print(iron)
+        if party.iron + iron < 0 then
+            trading.sell.iron.amount = trading.sell.iron.amount - 10
+        end
+    end
+    if x >= xb + 90 and x < xb + 122 and y >= yb + 60 and y < yb + 92 then
+        trading.sell.wood.amount = trading.sell.wood.amount + 10
+        local _, _, wood, _ = trade.compute_transaction()
+        if party.wood + wood < 0 then
+            trading.sell.wood.amount = trading.sell.wood.amount - 10
+        end
+    end
 end
