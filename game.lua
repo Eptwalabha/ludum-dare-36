@@ -17,7 +17,19 @@ party = {
     stone = 99999,
     iron = 99999,
     wood = 99999,
-    days_left = 100
+    days_left = 99999,
+    buildings = {
+        [1] = {
+            name = 'test',
+            x = 10,
+            y = 10
+        },
+        [2] = {
+            name = 'test',
+            x = 14,
+            y = 10
+        }
+    }
 }
 
 local item_test = {
@@ -39,6 +51,10 @@ function game.update(dt)
     if next_tic < 0 then
         next_tic = next_tic + tic_duration
         game.tic()
+        if party.days_left < 0 then
+            print('game over!')
+            party.days_left = 99999
+        end
     end
 end
 
@@ -55,7 +71,7 @@ function game.tic()
 end
 
 function game.draw()
-    map:draw()
+    map:draw(party.buildings)
     game.draw_entities()
     game_menu:draw()
     --mini_map:draw()
@@ -81,8 +97,13 @@ end
 
 function game.mousepressed (x, y, button, isTouch)
     mousedown = true
-    if active and active.mouse_pressed then
-        active:mouse_pressed(x, y, button)
+    if active then
+        if active == game_menu then
+            local action_menu = game_menu:mouse_pressed(x, y, button)
+            game.update_menu(action_menu)
+        elseif active == map then
+            local spec = map:mouse_pressed(x, y, button)
+        end
     end
 
     if active == map and cursor.action == 'build' then
@@ -90,22 +111,42 @@ function game.mousepressed (x, y, button, isTouch)
     end
 end
 
-function game.build()
-    if map:add_entity(item_test) then
-        party.gold = party.gold - 1000
-
-        if not love.keyboard.isDown('lctrl') then
-            cursor.action = 'none'
+function game.mousereleased (x, y, button, isTouch)
+    mousedown = false
+    if active then
+        if active == 'game_menu' then
+            game_menu:mouse_released(x, y, button)
         end
-    else
     end
 end
 
-function game.mousereleased (x, y, button, isTouch)
-    mousedown = false
-    if active and active.mouse_released then
-        active:mouse_released(x, y, button)
+function game.update_menu(action)
+
+    cursor.action = 'none'
+    if action == 'none' then
+        game_menu:deselect_all()
+    elseif action == 'aqueduc' then
+        game_menu:select_menu('aqueduc')
+    elseif action == 'building' then
+        game_menu:select_menu('building')
+        cursor.action = 'build'
+        cursor.item = item_test
+    elseif action == 'trade' then
+        game_menu:select_menu('trade')
+    elseif action == 'discover' then
+        game_menu:select_menu('discover')
     end
+end
+
+function game.build()
+    --if map:add_entity(item_test) then
+    --    party.gold = party.gold - 1000
+
+    --    if not love.keyboard.isDown('lctrl') then
+    --        cursor.action = 'none'
+    --    end
+    --else
+    --end
 end
 
 function game.mousemoved (x, y, dx, dy, isTouch)

@@ -124,18 +124,17 @@ end
 function GameMenu:wheel_moved (x, y)
 end
 
-function GameMenu:mouse_released (x, y, button)
+function GameMenu:mouse_pressed (x, y, button)
     if button == 1 then
         local action = GameMenu.get_action(x, y)
         if action then
-            cursor.action = ui_items.bottom[action].name
-        else
-            cursor.action = 'none'
-        end
-        for i = 1, #ui_items.bottom, 1 do
-            ui_items.bottom[i].selected = (i == action)
+            return ui_items.bottom[action].name
         end
     end
+    return 'none'
+end
+
+function GameMenu:mouse_released (x, y, button)
 end
 
 function GameMenu.get_action (x, y)
@@ -150,4 +149,28 @@ function GameMenu.get_action (x, y)
         end
     end
     return nil
+end
+
+function GameMenu:deselect_all ()
+    for i = 1, #ui_items.bottom, 1 do
+        ui_items.bottom[i].selected = false
+    end
+end
+
+function GameMenu:select_menu (name)
+    for i = 1, #ui_items.bottom, 1 do
+        if ui_items.bottom[i].name == name then
+            ui_items.bottom[i].selected = not ui_items.bottom[i].selected
+        else
+            ui_items.bottom[i].selected = false
+        end
+    end
+end
+
+function GameMenu:toggle_menu (name)
+    for i = 1, #ui_items.bottom, 1 do
+        if ui_items.bottom[i].name == name then
+            ui_items.bottom[i].selected = not ui_items.bottom[i].selected
+        end
+    end
 end

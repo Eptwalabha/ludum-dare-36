@@ -66,6 +66,14 @@ function Map:mouse_moved (x, y, dx, dy)
     self:set_active_tile(x, y)
 end
 
+function Map:mouse_pressed (x, y, button)
+    local index = self:get_index(x, y)
+    if index > 0 and index <= #self.data then
+        return self.data[index]
+    end
+    return nil
+end
+
 function Map:move_terrain(dx, dy)
     if mousedown then
         self:move_origin(dx, dy)
@@ -97,7 +105,7 @@ function Map:move_origin (dx, dy)
     end
 end
 
-function Map:draw()
+function Map:draw(buildings)
     for x = 0, self.width - 1, 1 do
         local x2 = self.origin.x + x * self.zoom
         for y = 0, self.height - 1, 1 do
@@ -112,6 +120,21 @@ function Map:draw()
             love.graphics.setColor(255, 255, 255)
             love.graphics.rectangle('line', x2, y2, self.zoom, self.zoom)
         end
+    end
+    if buildings then
+        self:draw_buildings(buildings)
+    end
+end
+
+function Map:draw_buildings(buildings)
+    love.graphics.setColor(255, 255, 255)
+    for i, building in ipairs(buildings) do
+        local scale = self.zoom / 32
+        love.graphics.draw(assets.textures.building,
+                           assets.images.building.test,
+                           self.origin.x + building.x * self.zoom,
+                           self.origin.y + building.y * self.zoom,
+                           0, scale, scale)
     end
 end
 

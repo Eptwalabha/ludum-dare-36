@@ -7,9 +7,9 @@ function love.conf(t)
     t.externalstorage = false           -- True to save files (and read from the save directory) in external storage on Android (boolean) 
     t.gammacorrect = false              -- Enable gamma-correct rendering, when supported by the system (boolean)
  
-    t.window.title = "Runner"
+    t.window.title = "Aqueduc simulator"
     t.window.icon = nil                 -- Filepath to an image to use as the window's icon (string)
-    t.window.width = 600
+    t.window.width = 800
     t.window.height = 600
     t.window.borderless = false         -- Remove all border visuals from the window (boolean)
     t.window.resizable = true          -- Let the window be user-resizable (boolean)
