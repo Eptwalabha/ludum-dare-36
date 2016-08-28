@@ -111,19 +111,23 @@ function Map:move_origin (dx, dy)
     end
 end
 
-function Map:draw(buildings)
+function Map:draw (buildings)
     for x = 0, self.width - 1, 1 do
         local x2 = self.origin.x + x * self.zoom
-        for y = 0, self.height - 1, 1 do
-            local y2 = self.origin.y + y * self.zoom
-            local index = y * self.width + x + 1
-            self:set_color(index)
-            if self.active.hover and self.active.x == x and self.active.y == y then
-                love.graphics.setColor(0, 100, 100)
+        if x2 + self.zoom >= 0 and x2 <= GAME_W then
+            for y = 0, self.height - 1, 1 do
+                local y2 = self.origin.y + y * self.zoom
+                if y2 + self.zoom >= TOP_HEIGHT and y2 <= GAME_H then
+                    local index = y * self.width + x + 1
+                    self:set_color(index)
+                    if self.active.hover and self.active.x == x and self.active.y == y then
+                        love.graphics.setColor(0, 100, 100)
+                    end
+                    love.graphics.rectangle('fill', x2, y2, self.zoom, self.zoom)
+                    love.graphics.setColor(255, 255, 255)
+                    love.graphics.rectangle('line', x2, y2, self.zoom, self.zoom)
+                end
             end
-            love.graphics.rectangle('fill', x2, y2, self.zoom, self.zoom)
-            love.graphics.setColor(255, 255, 255)
-            love.graphics.rectangle('line', x2, y2, self.zoom, self.zoom)
         end
     end
     if buildings then
