@@ -18,18 +18,7 @@ party = {
     iron = 99999,
     wood = 99999,
     days_left = 99999,
-    buildings = {
-        [1] = {
-            name = 'test',
-            x = 10,
-            y = 10
-        },
-        [2] = {
-            name = 'test',
-            x = 14,
-            y = 10
-        }
-    }
+    buildings = {}
 }
 
 local item_test = {
@@ -125,12 +114,18 @@ function game.update_menu(action)
     cursor.action = 'none'
     if action == 'none' then
         game_menu:deselect_all()
+        map.mode = 1
     elseif action == 'aqueduc' then
         game_menu:select_menu('aqueduc')
     elseif action == 'building' then
         game_menu:select_menu('building')
-        cursor.action = 'build'
-        cursor.item = item_test
+        if game_menu:is_menu_selected('building') then
+            map.mode = 2
+            cursor.action = 'build'
+            cursor.item = item_test
+        else
+            map.mode = 1
+        end
     elseif action == 'trade' then
         game_menu:select_menu('trade')
     elseif action == 'discover' then
@@ -139,14 +134,21 @@ function game.update_menu(action)
 end
 
 function game.build()
-    --if map:add_entity(item_test) then
-    --    party.gold = party.gold - 1000
-
-    --    if not love.keyboard.isDown('lctrl') then
-    --        cursor.action = 'none'
-    --    end
-    --else
-    --end
+    local mx, my = love.mouse.getPosition()
+    if map:add_entity(mx, my, item_test) then
+        party.gold = party.gold - 1000
+        if not love.keyboard.isDown('lctrl') then
+            cursor.action = 'none'
+            game_menu:toggle_menu('building')
+            map.mode = 1
+        end
+        local item = {}
+        item.name = item_test.name
+        item.x = item_test.x
+        item.y = item_test.y
+        table.insert(party.buildings, item)
+    else
+    end
 end
 
 function game.mousemoved (x, y, dx, dy, isTouch)

@@ -174,3 +174,12 @@ function GameMenu:toggle_menu (name)
         end
     end
 end
+
+function GameMenu:is_menu_selected (name)
+    for i = 1, #ui_items.bottom, 1 do
+        if ui_items.bottom[i].name == name then
+            return ui_items.bottom[i].selected
+        end
+    end
+    return false
+end

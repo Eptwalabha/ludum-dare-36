@@ -30,7 +30,7 @@ function Map.create(x, y, wood, stone, iron)
     for i = 1, x * y, 1 do
         local spec = {
             occupy = (math.random() > 0.9),
-            tree = 0,
+            wood = 0,
             iron = 0,
             stone = 0
         }
@@ -111,10 +111,9 @@ function Map:draw(buildings)
         for y = 0, self.height - 1, 1 do
             local y2 = self.origin.y + y * self.zoom
             local index = y * self.width + x + 1
+            self:set_color(index)
             if self.active.hover and self.active.x == x and self.active.y == y then
                 love.graphics.setColor(0, 100, 100)
-            else
-                love.graphics.setColor(0, 200, 100)
             end
             love.graphics.rectangle('fill', x2, y2, self.zoom, self.zoom)
             love.graphics.setColor(255, 255, 255)
@@ -123,6 +122,24 @@ function Map:draw(buildings)
     end
     if buildings then
         self:draw_buildings(buildings)
+    end
+end
+
+function Map:set_color(index)
+    local tile = self.data[index]
+    love.graphics.setColor(255, 255, 255)
+    if tile.wood > 1 then
+        love.graphics.setColor(0, 100, 0)
+    elseif tile.iron > 0 then
+        love.graphics.setColor(50, 50, 50)
+    else
+        love.graphics.setColor(0, 200, 100)
+    end
+
+    if self.mode == 2 then
+        if tile.occupy then
+            love.graphics.setColor(200, 0, 0)
+        end
     end
 end
 
@@ -149,7 +166,7 @@ function Map:draw_entity (mx, my, item)
             for y_s = y0, y0 + item.size - 1, 1 do
                 local y2 = self.origin.y + y_s * self.zoom
                 local index = self:pos_to_index(x_s, y_s)
-                if Map:is_buildable (index) then
+                if self:is_buildable (index) then
                     love.graphics.setColor(0, 255, 0)
                 else
                     buildable = false
@@ -179,7 +196,7 @@ function Map:is_buildable (index)
 
     local spec = self.data[index]
 
-    return not spec.occupy and spec.tree == 0
+    return not spec.occupy and spec.wood == 0
 end
 
 function Map:get_index (mx, my)
@@ -200,4 +217,40 @@ function Map:index_to_pos (index)
     local y = math.floor((index - 1) / self.width)
     local x = index - 1 - y * self.width
     return x, y
+end
+
+function Map:add_entity (mx, my, item)
+    local _, x, y = self:get_index(mx, my)
+    local x0 = x - math.floor((item.size - 1) / 2)
+    local y0 = y - math.floor((item.size - 1) / 2)
+    local to_check = self:get_indexes_from_area(x0, y0, item.size, item.size)
+
+    for i = 1, #to_check, 1 do
+        if not self:is_buildable (to_check[i]) then
+            return false
+        end
+    end
+
+    for i = 1, #to_check, 1 do
+        self.data[to_check[i]].occupy = true
+    end
+    item.x = x
+    item.y = y
+    return true
+end
+
+function Map:get_indexes_from_mouse_area (mx, my, w, h)
+    local _, x, y = self:get_index(mx, my)
+    return self:get_indexes_from_area(x, y, w, h)
+end
+
+function Map:get_indexes_from_area (x, y, w, h)
+    local indexes = {}
+    for i = x, x + w - 1, 1 do
+        for j = y, y + h - 1, 1 do
+            local index = self:pos_to_index(i, j)
+            table.insert(indexes, index)
+        end
+    end
+    return indexes
 end
