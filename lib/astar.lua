@@ -27,6 +27,11 @@ function astar.find (start_x, start_y, goal_x, goal_y, nodes)
     if start_x == goal_x and start_y == goal_y then
         return {{x = start_x, y = start_y}}
     end
+    if not astar.in_graph(start_x, start_y, nodes) or
+       not astar.in_graph(goal_x, goal_y, nodes) then
+       return {}
+   end
+
     local closed_set = {}
     local open_set = {}
     local start = nodes[start_x][start_y]
@@ -73,6 +78,10 @@ function astar.find (start_x, start_y, goal_x, goal_y, nodes)
     return path
 end
 
+function astar.in_graph(x, y, nodes)
+    return nodes[x] and nodes[x][y]
+end
+
 function astar.count (t)
     local i = 0
     for _ in pairs(t) do i = i + 1 end
@@ -107,8 +116,10 @@ function astar.get_node_neighbours (node, nodes, closed_set)
             if nodes[i] and nodes[i][j] then
                 if i ~= x or j ~= y then
                     local n = nodes[i][j]
-                    if not closed_set[n.index] then
-                        neigbours[n.index] = n
+                    if map:is_buildable(n.index) then
+                        if not closed_set[n.index] then
+                            neigbours[n.index] = n
+                        end
                     end
                 end
             end
