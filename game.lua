@@ -4,7 +4,7 @@ map = {}
 game_menu = {}
 active = map
 days_per_tic = 1
-tic_duration = 6
+tic_duration = .1
 next_tic = tic_duration
 
 cursor = {
@@ -29,6 +29,7 @@ local item_test = {
 
 items = {}
 local path = {}
+local mousemoved = false
 
 function game.enter()
     state = 'game'
@@ -55,8 +56,11 @@ function game.update(dt)
             party.days_left = 99999
         end
     end
-    local _, x, y = map:get_index(love.mouse.getX(), love.mouse.getY())
-    path = astar.find(1, 1, x, y, map.nodes)
+    if mousemoved then
+        local _, x, y = map:get_index(love.mouse.getX(), love.mouse.getY())
+        path = astar.find(1, 1, x, y, map.nodes)
+    end
+    mousemoved = false
 end
 
 function game.tic()
@@ -99,12 +103,11 @@ end
 
 function game.keypressed(key)
     if key == 'escape' then
-        love.event.push('quit')
+        pause:enter()
     end
 end
 
 function game.keyreleased(key)
-
 end
 
 function game.mousepressed (x, y, button, isTouch)
@@ -133,7 +136,6 @@ function game.mousereleased (x, y, button, isTouch)
 end
 
 function game.update_menu(action)
-
     cursor.action = 'none'
     if action == 'none' then
         game_menu:deselect_all()
@@ -176,6 +178,7 @@ function game.build()
 end
 
 function game.mousemoved (x, y, dx, dy, isTouch)
+    mousemoved = true
     if not mousedown then
         active = map
         if game_menu:is_mouse_over(x, y) then

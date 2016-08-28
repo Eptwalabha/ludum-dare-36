@@ -1,4 +1,5 @@
 require 'game'
+require 'pause'
 
 require 'game/map'
 require 'game/game_menu'
@@ -7,7 +8,8 @@ require 'lib/astar'
 require 'lib/util'
 
 game_states = {
-    ['game'] = game
+    ['game'] = game,
+    ['pause'] = pause
 }
 
 GAME_W = love.graphics.getWidth()
