@@ -144,7 +144,7 @@ function game.update_menu(action)
         game_menu:select_menu('building')
         if game_menu:is_menu_selected('building') then
             map.mode_mask = true
-            map:set_mask(false, true, true)
+            map:set_allowed_mask(true, false, true, true)
             cursor.action = 'build'
             cursor.item = item_test
         else

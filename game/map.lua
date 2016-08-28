@@ -39,12 +39,12 @@ function Map.load_from_file(file)
     return map
 end
 
-function Map.spec(occupy, wood, iron, stone, mountain)
+function Map.spec(building, mountain, wood, iron, stone)
     if not mountain then
         mountain = false
     end
     return {
-        occupy = occupy,
+        building = building,
         wood = wood,
         iron = iron,
         stone = stone,
@@ -54,19 +54,19 @@ end
 
 function Map.get_spec_from_color(r, g, b)
     if r == 50 and g == 50 and b == 50 then
-        return Map.spec(true, 0, 0, 0, true)
+        return Map.spec(false, true, 0, 0, 0)
     elseif r == 100 and g == 100 and b == 100 then
-        return Map.spec(false, 0, 100, 0)
+        return Map.spec(false, false, 0, 100, 0)
     elseif r == 0 and b == 0 then
         if g == 255 then
-            return Map.spec(false, 0, 0, 0)
+            return Map.spec(false, false, 0, 0, 0)
         elseif g == 150 then
-            return Map.spec(false, 100, 0, 0)
+            return Map.spec(false, false, 100, 0, 0)
         end
     elseif r == 255 and g == 255 and b == 255 then
-        return Map.spec(false, 0, 0, 100)
+        return Map.spec(false, false, 0, 0, 100)
     end
-    return Map.spec(false, 0, 0, 0)
+    return Map.spec(false, false, 0, 0, 0)
 end
 
 function Map.create(x, y, wood, stone, iron)
@@ -83,7 +83,7 @@ function Map.create(x, y, wood, stone, iron)
                     x = i,
                     y = j
                 },
-                occupy = (math.random() > 0.9),
+                building = (math.random() > 0.9),
                 wood = 0,
                 iron = 0,
                 stone = 0
@@ -184,10 +184,11 @@ end
 function Map:set_color(index)
     local tile = self.data[index]
     if self.mode_mask then
-        if tile.mountain or tile.occupy then
+        if tile.mountain then
             return 150, 0, 0
         end
-        if tile.wood ~= 0 and self.mask.wood or
+        if tile.building and self.mask.building or
+           tile.wood ~= 0 and self.mask.wood or
            tile.iron ~= 0 and self.mask.iron or
            tile.stone ~= 0 and self.mask.stone then
            return 150, 0, 0
@@ -260,12 +261,15 @@ function Map:is_buildable (index, mask)
 
     local spec = self.data[index]
 
-    return not spec.occupy and not spec.mountain and
-           not Map.spec_compatible_with_mask(spec, mask)
+    if self.mode_mask then
+        return not spec.mountain and not Map.spec_compatible_with_mask(spec, mask)
+    end
+    return not spec.mountain
 end
 
 function Map.spec_compatible_with_mask (spec, mask)
-    return spec.wood > 0 and mask.wood or
+    return spec.building and mask.building or
+           spec.wood > 0 and mask.wood or
            spec.iron > 0 and mask.iron or
            spec.stone > 0 and mask.stone
 end
@@ -303,7 +307,7 @@ function Map:add_entity (mx, my, item)
     end
 
     for i = 1, #to_check, 1 do
-        self.data[to_check[i]].occupy = true
+        self.data[to_check[i]].building = true
     end
     item.x = x
     item.y = y
@@ -326,10 +330,10 @@ function Map:get_indexes_from_area (x, y, w, h)
     return indexes
 end
 
-function Map:set_mask(wood, iron, stone)
-    self.mask = Map.make_mask(wood, iron, stone)
+function Map:set_allowed_mask(building, wood, iron, stone)
+    self.mask = Map.make_mask(building, wood, iron, stone)
 end
 
-function Map.make_mask(wood, iron, stone)
-    return { wood = wood, iron = iron, stone = stone }
+function Map.make_mask(building, wood, iron, stone)
+    return { building = building, wood = wood, iron = iron, stone = stone }
 end
