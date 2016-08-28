@@ -27,12 +27,15 @@ local item_test = {
     size = 3
 }
 
+items = {}
+
 function game.enter()
     state = 'game'
     map = Map.create(30,30,0,0,0)
     next_tic = tic_duration
     game_menu = GameMenu.create()
     love.graphics.setBackgroundColor(0, 0, 0)
+    items = love.filesystem.load('game/items.lua')()
 end
 
 function game.update(dt)
