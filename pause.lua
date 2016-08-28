@@ -9,6 +9,8 @@ end
 
 function pause.draw()
     game.draw()
+    love.graphics.setColor(0, 0, 0, 150)
+    love.graphics.rectangle('fill', 0, TOP_HEIGHT, GAME_W, GAME_H - BOTTOM_HEIGHT - TOP_HEIGHT)
     love.graphics.setColor(255, 255, 255)
     love.graphics.print("lol", GAME_W / 2, GAME_H / 2 - 10)
 end

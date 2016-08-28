@@ -1,5 +1,6 @@
 require 'game'
 require 'pause'
+require 'trade'
 
 require 'game/map'
 require 'game/game_menu'
@@ -9,7 +10,8 @@ require 'lib/util'
 
 game_states = {
     ['game'] = game,
-    ['pause'] = pause
+    ['pause'] = pause,
+    ['trade'] = trade
 }
 
 GAME_W = love.graphics.getWidth()
@@ -60,20 +62,20 @@ function love.keyreleased(key)
 end
 
 function love.mousepressed (x, y, button, isTouch)
-    if state == 'game' then
-        game_states['game'].mousepressed(x, y, button, isTouch)
+    if game_states[state].mousepressed then
+        game_states[state].mousepressed(x, y, button, isTouch)
     end
 end
 
 function love.mousereleased (x, y, button, isTouch)
-    if state == 'game' then
-        game_states['game'].mousereleased(x, y, button, isTouch)
+    if game_states[state].mousereleased then
+        game_states[state].mousereleased(x, y, button, isTouch)
     end
 end
 
 function love.mousemoved (x, y, dx, dy, isTouch)
-    if state == 'game' then
-        game_states['game'].mousemoved(x, y, dx, dy, isTouch)
+    if game_states[state].mousemoved then
+        game_states[state].mousemoved(x, y, dx, dy, isTouch)
     end
 end
 
@@ -109,5 +111,7 @@ function load_images()
     assets.images.icon.stone = love.graphics.newQuad(66, 0, 32, 32, w1, h1)
     assets.images.icon.wood = love.graphics.newQuad(99, 0, 32, 32, w1, h1)
     assets.images.icon.days_left = love.graphics.newQuad(132, 0, 32, 32, w1, h1)
+    assets.images.icon.minus = love.graphics.newQuad(165, 0, 32, 32, w1, h1)
+    assets.images.icon.plus = love.graphics.newQuad(198, 0, 32, 32, w1, h1)
     assets.images.building.test = love.graphics.newQuad(0, 0, 32, 32, w2, h2)
 end

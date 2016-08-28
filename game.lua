@@ -44,6 +44,7 @@ function game.enter()
     game_menu = GameMenu.create()
     love.graphics.setBackgroundColor(0, 0, 0)
     items = love.filesystem.load('game/items.lua')()
+        trade.enter()
 end
 
 function game.update(dt)
@@ -154,6 +155,7 @@ function game.update_menu(action)
         end
     elseif action == 'trade' then
         game_menu:select_menu('trade')
+        trade.enter()
     elseif action == 'discover' then
         game_menu:select_menu('discover')
     end

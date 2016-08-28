@@ -76,8 +76,7 @@
    { "name": "stone", "from": 2, "to": 2, "direction": "forward" },
    { "name": "wood", "from": 3, "to": 3, "direction": "forward" },
    { "name": "days_left", "from": 4, "to": 4, "direction": "forward" },
-   { "name": "left", "from": 5, "to": 5, "direction": "forward" },
-   { "name": "right", "from": 6, "to": 6, "direction": "forward" }
+   { "name": "left", "from": 5, "to": 5, "direction": "forward" }
   ],
   "layers": [
    { "name": "Layer 1", "opacity": 255, "blendMode": "normal" },
