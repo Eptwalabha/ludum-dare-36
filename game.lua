@@ -29,7 +29,12 @@ local item_test = {
 
 function game.enter()
     state = 'game'
-    map = Map.create(30,30,0,0,0)
+    map = Map.create(5,5,0,0,0)
+
+    local nodes = astar.prepare(map)
+    local path = astar.find (1, 1, 4, 4, nodes)
+    print(table.show(path))
+
     next_tic = tic_duration
     game_menu = GameMenu.create()
     love.graphics.setBackgroundColor(0, 0, 0)

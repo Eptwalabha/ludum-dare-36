@@ -3,6 +3,9 @@ require 'game'
 require 'game/map'
 require 'game/game_menu'
 
+require 'lib/astar'
+require 'lib/util'
+
 game_states = {
     ['game'] = game
 }
