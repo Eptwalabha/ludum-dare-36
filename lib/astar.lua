@@ -44,7 +44,7 @@ function astar.find (start_x, start_y, goal_x, goal_y, nodes)
             break
         end
 
-        astar.move_from_open_to_close(node, open_set, closed_set)
+        open_set, closed_set = astar.move_from_open_to_close(node, open_set, closed_set)
 
         local neigbours = astar.get_node_neighbours(node, nodes, closed_set)
 
@@ -66,12 +66,10 @@ function astar.find (start_x, start_y, goal_x, goal_y, nodes)
             end
         end
     end
-
     local path = {}
     if shortest_dist ~= -1 then
         path = astar.build_path(nodes[goal_x][goal_y])
     end
-    print(table.show(closed_set))
     return path
 end
 
@@ -83,9 +81,14 @@ end
 
 function astar.build_path (node)
     if not node then return {} end
-    if not node.parent then return {{x = node.x, y = node.y}} end
+    local node_path = {
+        x = node.x,
+        y = node.y,
+        index = node.index
+    }
+    if not node.parent then return {node_path} end
     local path = astar.build_path (node.parent)
-    table.insert(path, {x = node.x, y = node.y})
+    table.insert(path, node_path)
     return path
 end
 
@@ -115,8 +118,14 @@ function astar.get_node_neighbours (node, nodes, closed_set)
 end
 
 function astar.move_from_open_to_close (node, open, closed)
-    table.remove(open, node.index)
+    local new_open = {}
+    for i, n in pairs(open) do
+        if n.index ~= node.index then
+            new_open[n.index] = n
+        end
+    end
     closed[node.index] = node
+    return new_open, closed
 end
 
 function astar.next_node (open_set)
