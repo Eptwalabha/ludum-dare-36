@@ -4,7 +4,7 @@ map = {}
 game_menu = {}
 active = map
 days_per_tic = 1
-tic_duration = .1
+tic_duration = 2
 next_tic = tic_duration
 
 trade_open = false
@@ -20,7 +20,8 @@ party = {
     iron = 100,
     wood = 100,
     days_left = 99999,
-    buildings = {}
+    buildings = {},
+    aqueduc = {}
 }
 
 local item_test = {
@@ -36,15 +37,27 @@ local mousemoved = false
 function game.enter()
     state = 'game'
 
-    map = Map.load_from_file('assets/maps/map_test.png')
+    local file = 'assets/maps/map_test.png'
+    game.reset_party(file)
 
+    game_menu = GameMenu.create()
+    love.graphics.setBackgroundColor(0, 0, 0)
+end
+
+function game.reset_party(file)
+    map = Map.load_from_file(file)
+    party.aqueduc = Aqueduc.load_from_file(file)
     map.nodes = astar.prepare(map)
     path = astar.find (1, 1, map.width - 10, map.height -10, map.nodes)
 
-    active = map
+    party.gold = 999
+    party.stone = 999
+    party.iron = 999
+    party.wood = 999
+    party.day_left = 9999
+    party.buildings = {}
     next_tic = tic_duration
-    game_menu = GameMenu.create()
-    love.graphics.setBackgroundColor(0, 0, 0)
+    active = map
     items = love.filesystem.load('game/items.lua')()
 end
 
@@ -66,21 +79,20 @@ function game.update(dt)
 end
 
 function game.tic()
-    local nbr = days_per_tic
-    for day = 1, nbr, 1 do
-        local gold_spent = math.random(10)
-        party.gold = party.gold - gold_spent
-        party.wood = party.wood + math.random(90) + 10
-        party.iron = party.iron + math.random(90) + 10
-        party.stone = party.stone + math.random(90) + 10
-        party.days_left = party.days_left - 1
-    end
+    party.aqueduc:tic()
+    local gold_spent = math.random(10)
+    party.gold = party.gold - gold_spent
+    party.wood = party.wood + math.random(90) + 10
+    party.iron = party.iron + math.random(90) + 10
+    party.stone = party.stone + math.random(90) + 10
+    party.days_left = party.days_left - 1
 end
 
 function game.draw()
     map:draw(party.buildings)
     game.draw_entities()
 
+    party.aqueduc:draw(map.origin.x, map.origin.y, map.zoom)
     local lines = {}
     for i, node in ipairs(path) do
         table.insert(lines, map.origin.x + node.x * map.zoom + map.zoom / 2)
@@ -106,6 +118,7 @@ end
 function game.keypressed(key)
     if key == 'escape' then
         pause:enter()
+        love.event.push('quit')
     end
 end
 

@@ -4,6 +4,7 @@ require 'trade'
 
 require 'game/map'
 require 'game/game_menu'
+require 'game/aqueduc'
 
 require 'lib/astar'
 require 'lib/util'

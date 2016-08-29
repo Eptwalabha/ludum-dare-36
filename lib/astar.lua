@@ -111,11 +111,12 @@ function astar.get_node_neighbours (node, nodes, closed_set)
     local x = node.x
     local y = node.y
     local neigbours = {}
-    for i = x - 1, x + 1, 1 do
-        for j = y - 1, y + 1, 1 do
-            if nodes[i] and nodes[i][j] then
-                if i ~= x or j ~= y then
-                    local n = nodes[i][j]
+    for i = -1, 1, 1 do
+        for j = -1, 1, 1 do
+            if -- (i + j * 3) % 2 ~= 0 and
+               nodes[x + i] and nodes[x + i][y + j] then
+                if i ~= 0 or j ~= 0 then
+                    local n = nodes[x + i][y + j]
                     if map:is_buildable(n.index) then
                         if not closed_set[n.index] then
                             neigbours[n.index] = n
