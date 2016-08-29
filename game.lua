@@ -249,7 +249,7 @@ function game.build(mx, my)
         item.name = item_test.name
         item.x = item_test.x
         item.y = item_test.y
-        item.radius = 3
+        item.radius = 4
         item.capacity = {
             iron = 10,
             stone = 0,

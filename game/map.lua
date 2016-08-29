@@ -346,8 +346,8 @@ function Map:fetch_ressouces_at(building, radius)
    for x = building.x - radius, building.x + radius, 1 do
        for y = building.y - radius, building.y + radius, 1 do
            if x >= 0 and x < self.width and y >= 0 and y < self.height then
-               if x == building.x - radius or x == building.x + radius or
-                  y == building.y - radius or y == building.y + radius then
+               local manathan = math.abs(y - building.y) + math.abs(x - building.x)
+               if manathan == radius then
                    local index = x + y * self.width + 1
                    table.insert(indexes, index)
                end
