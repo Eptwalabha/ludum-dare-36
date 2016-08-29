@@ -55,8 +55,8 @@ function trade.draw()
     game.draw()
     love.graphics.setColor(0, 0, 0, 150)
     love.graphics.rectangle('fill', 0, TOP_HEIGHT, GAME_W, GAME_H - BOTTOM_HEIGHT - TOP_HEIGHT)
-    love.graphics.setColor(100, 100, 100)
-    love.graphics.rectangle('fill', 100, TOP_HEIGHT + 50, GAME_W - 200, GAME_H - BOTTOM_HEIGHT - TOP_HEIGHT - 100)
+    love.graphics.setColor(255, 255, 255)
+    love.graphics.draw(assets.images.trade, 100, TOP_HEIGHT + 50)
     love.graphics.setColor(50, 50, 50)
     love.graphics.line(GAME_W / 2, GAME_H / 2 - 150, GAME_W / 2, GAME_H / 2 + 70)
     love.graphics.line(GAME_W / 2 - 250, GAME_H / 2 - 50, GAME_W / 2 + 250, GAME_H / 2 - 50)
@@ -72,11 +72,11 @@ end
 
 function trade.draw_confirm (x, y)
     love.graphics.setColor(0, 150, 50)
-    love.graphics.rectangle('fill', x - 102, y - 2, 204, 34)
+    love.graphics.rectangle('fill', x - 102, y - 2, 204, 29)
     love.graphics.setColor(0, 200, 100)
-    love.graphics.rectangle('fill', x - 100, y, 200, 30)
+    love.graphics.rectangle('fill', x - 100, y, 200, 25)
     love.graphics.setColor(255, 255, 255)
-    love.graphics.print("CONFIRM", x - 22, y + 8)
+    love.graphics.print("CONFIRM", x - 22, y + 6)
 end
 
 function trade.draw_close(x, y)
@@ -106,8 +106,9 @@ function trade.draw_icon(x, y, icon, value, add)
     love.graphics.draw(assets.textures.icon, assets.images.icon[icon],
                        x, y - 16)
     local price = value
+    love.graphics.setColor(0, 0, 0)
     if price > 0 then
-        love.graphics.setColor(0, 255, 0)
+        love.graphics.setColor(0, 155, 0)
         price = '+' .. price
     elseif price < 0 then
         love.graphics.setColor(255, 0, 0)
@@ -154,13 +155,18 @@ function trade.draw_slider(x, y, icon, item, sign)
                        x, y - 16)
     love.graphics.draw(assets.textures.icon, assets.images.icon.minus,
                        x + 50, y - 16)
+    love.graphics.setColor(0, 0, 0)
     love.graphics.print(item.amount, x + 90, y - 7)
+    love.graphics.setColor(255, 255, 255)
     love.graphics.draw(assets.textures.icon, assets.images.icon.plus,
                        x + 140, y - 16)
+    love.graphics.setColor(0, 0, 0)
     love.graphics.print('=', x + 180, y - 7)
+    love.graphics.setColor(255, 255, 255)
     love.graphics.draw(assets.textures.icon, assets.images.icon.gold,
                        x + 195, y - 16)
 
+    love.graphics.setColor(0, 0, 0)
     local price = item.price
     if price ~= 0 then
         price = price * sign
@@ -168,10 +174,8 @@ function trade.draw_slider(x, y, icon, item, sign)
     if price < 0 then
         love.graphics.setColor(255, 0, 0)
     elseif price > 0 then
-        love.graphics.setColor(0, 255, 0)
+        love.graphics.setColor(0, 155, 0)
         price = '+' .. price
-    else
-        love.graphics.setColor(255, 255, 255)
     end
     love.graphics.print(price, x + 225, y - 7)
 end
@@ -216,7 +220,7 @@ end
 
 function trade.check_valide(x, y)
     local x2, y2 = GAME_W / 2, GAME_H / 2 + 130
-    if x >= x2 - 102 and x < x2 + 102 and y >= y2 - 2 and y < y2 + 32 then
+    if x >= x2 - 102 and x < x2 + 102 and y >= y2 - 2 and y < y2 + 27 then
         trade.trade()
         state = 'game'
         game_menu:select_menu('trade', false)
