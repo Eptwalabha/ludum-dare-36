@@ -60,8 +60,7 @@ function Aqueduc.make_node(x, y, delay)
     return { x = x, y = y, delay = delay }
 end
 
-function Aqueduc:is_complete()
-
+function Aqueduc:is_completed()
     return false
 end
 

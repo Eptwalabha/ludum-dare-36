@@ -1,5 +1,6 @@
 trade = {}
 
+local next_price_update = 10
 local trading = {
     sell = {
         stone = {
@@ -340,3 +341,28 @@ function trade.return_to_game()
     game_menu:select_menu('trade', false)
 end
 
+function trade.tic()
+    next_price_update = next_price_update - 1
+    if next_price_update == 0 then
+        trade.update_quotations()
+        next_price_update = 10
+    end
+end
+
+function trade.update_quotations()
+    local nq = 0
+    nq = trading.sell.iron.quotation + math.random(10) - 5
+    if nq < 5 then nq = 5 end
+    trading.sell.iron.quotation = nq
+    trading.buy.iron.quotation = math.ceil(nq * (math.random(5) / 10 + 1))
+
+    nq = trading.sell.stone.quotation + math.random(10) - 5
+    if nq < 5 then nq = 5 end
+    trading.sell.stone.quotation = nq
+    trading.buy.stone.quotation = math.ceil(nq * (math.random(5) / 10 + 1))
+
+    nq = trading.sell.wood.quotation + math.random(10) - 5
+    if nq < 5 then nq = 5 end
+    trading.sell.wood.quotation = nq
+    trading.buy.wood.quotation = math.ceil(nq * (math.random(5) / 10 + 1))
+end

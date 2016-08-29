@@ -79,8 +79,7 @@ function game.update(dt)
         next_tic = next_tic + tic_duration
         game.tic()
         if party.days_left < 0 then
-            print('game over!')
-            party.days_left = 99999
+            -- game_over:failure('timeout')
         end
     end
 end
@@ -93,6 +92,7 @@ function game.tic()
     party.iron = party.iron + math.random(90) + 10
     party.stone = party.stone + math.random(90) + 10
     if not party.infinity then party.days_left = party.days_left - 1 end
+    trade.tic()
 end
 
 function game.draw()
@@ -214,6 +214,9 @@ function game.build_aqueduc(path)
         if not inserted then
             break
         end
+    end
+    if party.aqueduc:is_completed() then
+        game_over:victory()
     end
 end
 
