@@ -143,9 +143,7 @@ end
 
 function trade.keypressed(key)
     if key == 'escape' then
-        state = 'game'
-        game_menu:select_menu('trade')
-        love.event.push('quit')
+        trade.return_to_game()
     end
 end
 
@@ -192,13 +190,15 @@ function trade.mousepressed (x, y, button, isTouch)
 end
 
 function trade.mousereleased (x, y, button, isTouch)
-    repeat_delay = 0
-    local x2, y2 = 100, TOP_HEIGHT + 50
-    if x < x2 or x > x2 + GAME_W - 200 or
-       y < y2 or y > y2 + GAME_H - BOTTOM_HEIGHT - TOP_HEIGHT - 100 then
-        state = 'game'
-        game_menu:select_menu('trade', false)
+    if not trade_open then
+        repeat_delay = 0
+        local x2, y2 = 100, TOP_HEIGHT + 50
+        if x < x2 or x > x2 + GAME_W - 200 or
+           y < y2 or y > y2 + GAME_H - BOTTOM_HEIGHT - TOP_HEIGHT - 100 then
+            trade.return_to_game()
+        end
     end
+    trade_open = false
 end
 
 function trade.mousemoved (x, y, dx, dy, isTouch)
@@ -213,8 +213,7 @@ end
 function trade.check_close(x, y)
     local x2, y2 = GAME_W - 142, TOP_HEIGHT + 60
     if x >= x2 and x < x2 + 32 and y >= y2 and y < y2 + 32 then
-        state = 'game'
-        game_menu:select_menu('trade', false)
+        trade.return_to_game()
     end
 end
 
@@ -222,8 +221,7 @@ function trade.check_valide(x, y)
     local x2, y2 = GAME_W / 2, GAME_H / 2 + 130
     if x >= x2 - 102 and x < x2 + 102 and y >= y2 - 2 and y < y2 + 27 then
         trade.trade()
-        state = 'game'
-        game_menu:select_menu('trade', false)
+        trade.return_to_game()
     end
 end
 
@@ -336,3 +334,9 @@ function trade.check_sliders()
         end
     end
 end
+
+function trade.return_to_game()
+    state = 'game'
+    game_menu:select_menu('trade', false)
+end
+

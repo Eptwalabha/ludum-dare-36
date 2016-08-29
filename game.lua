@@ -7,6 +7,8 @@ days_per_tic = 1
 tic_duration = .1
 next_tic = tic_duration
 
+trade_open = false
+
 cursor = {
     action = 'none',
     item = {}
@@ -44,7 +46,6 @@ function game.enter()
     game_menu = GameMenu.create()
     love.graphics.setBackgroundColor(0, 0, 0)
     items = love.filesystem.load('game/items.lua')()
-        trade.enter()
 end
 
 function game.update(dt)
@@ -155,6 +156,7 @@ function game.update_menu(action)
         end
     elseif action == 'trade' then
         game_menu:select_menu('trade')
+        trade_open = true
         trade.enter()
     elseif action == 'discover' then
         game_menu:select_menu('discover')
