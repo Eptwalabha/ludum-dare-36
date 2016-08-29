@@ -56,7 +56,7 @@ function Map.get_spec_from_color(r, g, b)
     if r == 50 and g == 50 and b == 50 then
         return Map.spec(false, true, 0, 0, 0)
     elseif r == 100 and g == 100 and b == 100 then
-        return Map.spec(false, false, 0, 100, 0)
+        return Map.spec(false, true, 0, 100, 0)
     elseif r == 0 and b == 0 then
         if g == 255 then
             return Map.spec(false, false, 0, 0, 0)
@@ -195,11 +195,14 @@ function Map:set_color(index)
 end
 
 function Map:draw_buildings(buildings)
-    love.graphics.setColor(255, 255, 255)
     for i, building in ipairs(buildings) do
+        love.graphics.setColor(255, 255, 255)
+        if building.delay ~= 0 then
+            love.graphics.setColor(255, 255, 255, 150)
+        end
         local scale = self.zoom / 32
         love.graphics.draw(assets.textures.building,
-                           assets.images.building.test,
+                           assets.images.building[building.image],
                            self.origin.x + building.x * self.zoom,
                            self.origin.y + building.y * self.zoom,
                            0, scale, scale)

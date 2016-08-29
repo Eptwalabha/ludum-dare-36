@@ -91,7 +91,10 @@ function game.tic()
 
     local iron, stone, wood = 0, 0, 0
     for _, building in pairs(party.buildings) do
-        if building.radius ~= nil and building.capacity then
+        if building.delay > 0 then
+            building.delay = building.delay - 1
+        end
+        if building.radius ~= nil and building.capacity and building.delay == 0 then
             map:fetch_ressouces(building)
             iron = iron + building.fetch.iron
             stone = stone + building.fetch.stone
@@ -241,7 +244,8 @@ function game.build(mx, my)
             map.mode_mask = false
         end
         local item = {}
-        item.delay = 0
+        item.delay = 5
+        item.image = 'test'
         item.name = item_test.name
         item.x = item_test.x
         item.y = item_test.y
