@@ -32,7 +32,17 @@ local item_test = {
 
 items = {}
 local path = {}
-local mousemoved = false
+
+local mouse = {
+    down = false,
+    released = false,
+    moved = false,
+    drag = false,
+    origin = {
+        x = 0,
+        y = 0
+    }
+}
 
 function game.enter()
     state = 'game'
@@ -71,11 +81,6 @@ function game.update(dt)
             party.days_left = 99999
         end
     end
-    if mousemoved then
-        local _, x, y = map:get_index(love.mouse.getX(), love.mouse.getY())
-        path = astar.find(1, 1, x, y, map.nodes)
-    end
-    mousemoved = false
 end
 
 function game.tic()
@@ -117,8 +122,14 @@ end
 
 function game.keypressed(key)
     if key == 'escape' then
-        pause:enter()
-        love.event.push('quit')
+        if cursor.action == 'none' then
+            pause:enter()
+            love.event.push('quit')
+        else
+            cursor.action = 'none'
+            map.mode_mask = false
+            game_menu:deselect_all()
+        end
     end
 end
 
@@ -126,13 +137,14 @@ function game.keyreleased(key)
 end
 
 function game.mousepressed (x, y, button, isTouch)
-    mousedown = true
+    mouse.down = true
+    mouse.origin.x = x
+    mouse.origin.y = y
+
     if active then
         if active == game_menu then
             local action_menu = game_menu:mouse_pressed(x, y, button)
             game.update_menu(action_menu)
-        elseif active == map then
-            local spec = map:mouse_pressed(x, y, button)
         end
     end
 
@@ -142,26 +154,33 @@ function game.mousepressed (x, y, button, isTouch)
 end
 
 function game.mousereleased (x, y, button, isTouch)
-    mousedown = false
-    if active then
-        if active == game_menu then
-            game_menu:mouse_released(x, y, button)
-        end
-    end
+    mouse.drag = false
+    mouse.down = false
 end
 
 function game.update_menu(action)
+    local x, y = love.mouse.getPosition()
     cursor.action = 'none'
     if action == 'none' then
         game_menu:deselect_all()
         map.mode_mask = false
     elseif action == 'aqueduc' then
         game_menu:select_menu('aqueduc')
+        if game_menu:is_menu_selected('aqueduc') then
+            local index, x_s, y_s = map:get_index(x, y)
+            cursor.action = 'build_aqueduc'
+            cursor.start = map.data[index]
+            map.mode_mask = true
+            map:set_forbiden_mask(true, true, true, true)
+        else
+            cursor.action = 'none'
+            map.mode_mask = false
+        end
     elseif action == 'building' then
         game_menu:select_menu('building')
         if game_menu:is_menu_selected('building') then
             map.mode_mask = true
-            map:set_allowed_mask(true, false, true, true)
+            map:set_forbiden_mask(true, false, true, true)
             cursor.action = 'build'
             cursor.item = item_test
         else
@@ -195,15 +214,27 @@ function game.build()
 end
 
 function game.mousemoved (x, y, dx, dy, isTouch)
-    mousemoved = true
-    if not mousedown then
+    mouse.moved = true
+    if mouse.down then
+        mouse.drag = true
+        if active == map then
+            map:set_active_tile(x, y)
+            if cursor.action == 'build_aqueduc' then
+                local _, x1, y1 = map:get_index(mouse.origin.x, mouse.origin.y)
+                local _, x2, y2 = map:get_index(x, y)
+
+                path = astar.find(x1, y1, x2, y2, map.nodes)
+            elseif cursor.action == 'none' then
+                map:move_origin(dx, dy)
+            end
+        elseif active and active.mouse_moved then
+            active:mouse_moved(x, y, dx, dy)
+        end
+    else
         active = map
         if game_menu:is_mouse_over(x, y) then
             active = game_menu
         end
-    end
-    if active and active.mouse_moved then
-        active:mouse_moved(x, y, dx, dy)
     end
 end
 

@@ -114,25 +114,12 @@ function Map:is_mouse_over (x, y)
     return true
 end
 
-function Map:mouse_moved (x, y, dx, dy)
-    if cursor.action == 'none' then
-        self:move_terrain(dx, dy)
-    end
-    self:set_active_tile(x, y)
-end
-
 function Map:mouse_pressed (x, y, button)
     local index = self:get_index(x, y)
     if index > 0 and index <= #self.data then
         return self.data[index]
     end
     return nil
-end
-
-function Map:move_terrain(dx, dy)
-    if mousedown then
-        self:move_origin(dx, dy)
-    end
 end
 
 function Map:wheel_moved (x, y)
@@ -330,7 +317,7 @@ function Map:get_indexes_from_area (x, y, w, h)
     return indexes
 end
 
-function Map:set_allowed_mask(building, wood, iron, stone)
+function Map:set_forbiden_mask(building, wood, iron, stone)
     self.mask = Map.make_mask(building, wood, iron, stone)
 end
 

@@ -134,9 +134,6 @@ function GameMenu:mouse_pressed (x, y, button)
     return 'none'
 end
 
-function GameMenu:mouse_released (x, y, button)
-end
-
 function GameMenu.get_action (x, y)
     if y > GAME_H - BOTTOM_HEIGHT + 10 and y < GAME_H - 10 then
         for i = 1, #ui_items.bottom, 1 do
