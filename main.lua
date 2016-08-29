@@ -113,5 +113,6 @@ function load_images()
     assets.images.icon.days_left = love.graphics.newQuad(132, 0, 32, 32, w1, h1)
     assets.images.icon.minus = love.graphics.newQuad(165, 0, 32, 32, w1, h1)
     assets.images.icon.plus = love.graphics.newQuad(198, 0, 32, 32, w1, h1)
+    assets.images.icon.close = love.graphics.newQuad(231, 0, 32, 32, w1, h1)
     assets.images.building.test = love.graphics.newQuad(0, 0, 32, 32, w2, h2)
 end

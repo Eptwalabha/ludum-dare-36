@@ -58,10 +58,30 @@ function trade.draw()
     love.graphics.setColor(100, 100, 100)
     love.graphics.rectangle('fill', 100, TOP_HEIGHT + 50, GAME_W - 200, GAME_H - BOTTOM_HEIGHT - TOP_HEIGHT - 100)
     love.graphics.setColor(50, 50, 50)
-    love.graphics.line(GAME_W / 2, GAME_H / 2 - 150, GAME_W / 2, GAME_H / 2 + 80)
-    trade.draw_quotations(GAME_W / 2, GAME_H / 2 - 100)
+    love.graphics.line(GAME_W / 2, GAME_H / 2 - 150, GAME_W / 2, GAME_H / 2 + 70)
+    love.graphics.line(GAME_W / 2 - 250, GAME_H / 2 - 50, GAME_W / 2 + 250, GAME_H / 2 - 50)
+    love.graphics.line(GAME_W / 2 - 250, GAME_H / 2 - 100, GAME_W / 2 + 250, GAME_H / 2 - 100)
+    love.graphics.line(GAME_W / 2 - 250, GAME_H / 2 + 70, GAME_W / 2 + 250, GAME_H / 2 + 70)
+    love.graphics.line(GAME_W / 2 - 250, GAME_H / 2 + 120, GAME_W / 2 + 250, GAME_H / 2 + 120)
+    trade.draw_quotations(GAME_W / 2, GAME_H / 2 - 75)
     trade.draw_sliders(GAME_W / 2, GAME_H / 2 - 20)
-    trade.draw_summary(GAME_W / 2, GAME_H / 2 + 100)
+    trade.draw_summary(GAME_W / 2, GAME_H / 2 + 95)
+    trade.draw_close(GAME_W - 142, TOP_HEIGHT + 60)
+    trade.draw_confirm(GAME_W / 2, GAME_H / 2 + 130)
+end
+
+function trade.draw_confirm (x, y)
+    love.graphics.setColor(0, 150, 50)
+    love.graphics.rectangle('fill', x - 102, y - 2, 204, 34)
+    love.graphics.setColor(0, 200, 100)
+    love.graphics.rectangle('fill', x - 100, y, 200, 30)
+    love.graphics.setColor(255, 255, 255)
+    love.graphics.print("CONFIRM", x - 22, y + 8)
+end
+
+function trade.draw_close(x, y)
+    love.graphics.setColor(255, 255, 255)
+    love.graphics.draw(assets.textures.icon, assets.images.icon.close, x, y)
 end
 
 function trade.draw_summary(x, y)
@@ -72,10 +92,16 @@ function trade.draw_summary(x, y)
     trade.draw_icon(x + 100, y, 'gold', gold)
 end
 
-function trade.draw_quotations()
+function trade.draw_quotations(x, y)
+    trade.draw_icon(x - 275, y, 'iron', -1 * trading.buy.iron.quotation)
+    trade.draw_icon(x - 200, y, 'stone', -1 * trading.buy.stone.quotation)
+    trade.draw_icon(x - 125, y, 'wood', -1 * trading.buy.wood.quotation)
+    trade.draw_icon(x + 25, y, 'iron', trading.sell.iron.quotation)
+    trade.draw_icon(x + 100, y, 'stone', trading.sell.stone.quotation)
+    trade.draw_icon(x + 175, y, 'wood', trading.sell.wood.quotation)
 end
 
-function trade.draw_icon(x, y, icon, value)
+function trade.draw_icon(x, y, icon, value, add)
     love.graphics.setColor(255, 255, 255)
     love.graphics.draw(assets.textures.icon, assets.images.icon[icon],
                        x, y - 16)
@@ -86,8 +112,10 @@ function trade.draw_icon(x, y, icon, value)
     elseif price < 0 then
         love.graphics.setColor(255, 0, 0)
     end
+    if add then
+        price = price .. add
+    end
     love.graphics.print(price, x + 40, y - 7)
-
 end
 
 function trade.draw_sliders(x, y)
@@ -155,14 +183,17 @@ end
 function trade.mousepressed (x, y, button, isTouch)
     repeat_delay = 0.4
     trade.check_sliders()
+    trade.check_close(x, y)
+    trade.check_valide(x, y)
 end
 
 function trade.mousereleased (x, y, button, isTouch)
     repeat_delay = 0
-    if x < 100 or x > GAME_W - 100 or
-       y < TOP_HEIGHT + 50 or y > GAME_H - 100 then
+    local x2, y2 = 100, TOP_HEIGHT + 50
+    if x < x2 or x > x2 + GAME_W - 200 or
+       y < y2 or y > y2 + GAME_H - BOTTOM_HEIGHT - TOP_HEIGHT - 100 then
         state = 'game'
-        game_menu:select_menu('trade')
+        game_menu:select_menu('trade', false)
     end
 end
 
@@ -173,6 +204,23 @@ function trade.wheelmoved (x, y)
 end
 
 function trade.leave()
+end
+
+function trade.check_close(x, y)
+    local x2, y2 = GAME_W - 142, TOP_HEIGHT + 60
+    if x >= x2 and x < x2 + 32 and y >= y2 and y < y2 + 32 then
+        state = 'game'
+        game_menu:select_menu('trade', false)
+    end
+end
+
+function trade.check_valide(x, y)
+    local x2, y2 = GAME_W / 2, GAME_H / 2 + 130
+    if x >= x2 - 102 and x < x2 + 102 and y >= y2 - 2 and y < y2 + 32 then
+        trade.trade()
+        state = 'game'
+        game_menu:select_menu('trade', false)
+    end
 end
 
 function trade.trade()

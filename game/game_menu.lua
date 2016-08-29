@@ -157,10 +157,14 @@ function GameMenu:deselect_all ()
     end
 end
 
-function GameMenu:select_menu (name)
+function GameMenu:select_menu (name, value)
     for i = 1, #ui_items.bottom, 1 do
         if ui_items.bottom[i].name == name then
-            ui_items.bottom[i].selected = not ui_items.bottom[i].selected
+            if value == nil then
+                ui_items.bottom[i].selected = not ui_items.bottom[i].selected
+            else
+                ui_items.bottom[i].selected = value
+            end
         else
             ui_items.bottom[i].selected = false
         end
