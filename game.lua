@@ -85,7 +85,9 @@ function game.update(dt)
 end
 
 function game.tic()
-    party.aqueduc:tic()
+    if party.aqueduc:tic() then
+        game_over:victory()
+    end
     local gold_spent = math.random(10)
     party.gold = party.gold - gold_spent
     party.wood = party.wood + math.random(90) + 10
@@ -210,13 +212,10 @@ end
 
 function game.build_aqueduc(path)
     for i, node in ipairs(path) do
-        local inserted = party.aqueduc:insert_node_at(node.x, node.y, 10)
+        local inserted = party.aqueduc:insert_node_at(node.x, node.y)
         if not inserted then
             break
         end
-    end
-    if party.aqueduc:is_completed() then
-        game_over:victory()
     end
 end
 

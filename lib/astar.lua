@@ -1,10 +1,30 @@
 astar = {}
 
+function astar.create(width, graph)
+    local nodes = {}
+    local count = 0
+    for index, node in pairs(graph) do
+        count = count + 1
+        local y = math.floor((index - 1) / width)
+        local x = (index - 1) % width
+        if not nodes[x] then nodes[x] = {} end
+        nodes[x][y] = {
+            x = x,
+            y = y,
+            parent = {},
+            F = -1,
+            G = 0,
+            heuristic = 0,
+            index = index
+        }
+    end
+    return nodes
+end
+
 function astar.prepare (maps)
     local nodes = {}
     local w = maps.width - 1
     local h = maps.height - 1
-
     for x = 0, w, 1 do
         nodes[x] = {}
         for y = 0, h, 1 do
@@ -29,9 +49,8 @@ function astar.find (start_x, start_y, goal_x, goal_y, nodes, only_side)
     end
     if not astar.in_graph(start_x, start_y, nodes) or
        not astar.in_graph(goal_x, goal_y, nodes) then
-       return {}
-   end
-
+        return {}
+    end
     local closed_set = {}
     local open_set = {}
     local start = nodes[start_x][start_y]
@@ -156,8 +175,8 @@ function astar.next_node (open_set)
 end
 
 function astar.set_heuristic (node, nodes)
-    for i = 0, #nodes, 1 do
-        for j = 0, #nodes[i], 1 do
+    for i, nodes_i in pairs(nodes) do
+        for j, _ in pairs(nodes_i) do
             nodes[i][j].parent = nil
             nodes[i][j].heuristic = math.abs(node.x - nodes[i][j].x) +
                                     math.abs(node.y - nodes[i][j].y)
