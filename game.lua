@@ -4,7 +4,7 @@ map = {}
 game_menu = {}
 active = map
 days_per_tic = 1
-tic_duration = 2
+tic_duration = .2
 next_tic = tic_duration
 
 trade_open = false
@@ -66,7 +66,7 @@ function game.reset_party(file)
     party.stone = 999
     party.iron = 999
     party.wood = 999
-    party.days_left = 10
+    party.days_left = 1000
     party.buildings = {}
     next_tic = tic_duration
     active = map
@@ -88,11 +88,21 @@ function game.tic()
     if party.aqueduc:tic() then
         game_over:victory()
     end
-    local gold_spent = math.random(10)
-    party.gold = party.gold - gold_spent
-    party.wood = party.wood + math.random(90) + 10
-    party.iron = party.iron + math.random(90) + 10
-    party.stone = party.stone + math.random(90) + 10
+
+    local iron, stone, wood = 0, 0, 0
+    for _, building in pairs(party.buildings) do
+        if building.radius ~= nil and building.capacity then
+            map:fetch_ressouces(building)
+            iron = iron + building.fetch.iron
+            stone = stone + building.fetch.stone
+            wood = wood + building.fetch.wood
+        end
+    end
+
+    party.iron = party.iron + iron
+    party.stone = party.stone + stone
+    party.wood = party.wood + wood
+
     if not party.infinity then party.days_left = party.days_left - 1 end
     trade.tic()
 end
@@ -166,9 +176,12 @@ function game.mousereleased (x, y, button, isTouch)
     mouse.down = false
 
     if cursor.action == 'building_aqueduc' then
-        cursor.action = 'none'
-        map.mode_mask = false
-        game_menu:select_menu('aqueduc', false)
+        cursor.action = 'build_aqueduc'
+        if not love.keyboard.isDown('lctrl') then
+            cursor.action = 'none'
+            map.mode_mask = false
+            game_menu:select_menu('aqueduc', false)
+        end
         if #path > 0 then
             game.build_aqueduc(path)
         end
@@ -228,9 +241,16 @@ function game.build(mx, my)
             map.mode_mask = false
         end
         local item = {}
+        item.delay = 0
         item.name = item_test.name
         item.x = item_test.x
         item.y = item_test.y
+        item.radius = 3
+        item.capacity = {
+            iron = 10,
+            stone = 0,
+            wood = 100
+        }
         table.insert(party.buildings, item)
     else
     end

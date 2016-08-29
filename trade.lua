@@ -42,6 +42,12 @@ local repeat_delay = 0
 
 function trade.enter()
     state = 'trade'
+    trading.sell.iron.amount = 0
+    trading.sell.stone.amount = 0
+    trading.sell.wood.amount = 0
+    trading.buy.iron.amount = 0
+    trading.buy.stone.amount = 0
+    trading.buy.wood.amount = 0
 end
 
 function trade.update(dt)

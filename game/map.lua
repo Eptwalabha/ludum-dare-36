@@ -191,7 +191,7 @@ function Map:set_color(index)
     elseif tile.mountain then
         return 50, 50, 50
     end
-    return 0, 200, 100 
+    return 0, 200, 100
 end
 
 function Map:draw_buildings(buildings)
@@ -319,6 +319,66 @@ end
 
 function Map:set_forbiden_mask(building, wood, iron, stone)
     self.mask = Map.make_mask(building, wood, iron, stone)
+end
+
+function Map:fetch_ressouces(building)
+    building.fetch = {}
+    building.fetch.iron = 0
+    building.fetch.stone = 0
+    building.fetch.wood = 0
+
+    if building.delay == 0 then
+        local all_ressources = false
+        for radius = 0, building.radius, 1 do
+            all_ressources = self:fetch_ressouces_at(building, radius)
+            if all_ressources then break end
+        end
+    end
+end
+
+function Map:fetch_ressouces_at(building, radius)
+   local x, y = building.x, building.y
+   local indexes = {}
+
+   for x = building.x - radius, building.x + radius, 1 do
+       for y = building.y - radius, building.y + radius, 1 do
+           if x >= 0 and x < self.width and y >= 0 and y < self.height then
+               if x == building.x - radius or x == building.x + radius or
+                  y == building.y - radius or y == building.y + radius then
+                   local index = x + y * self.width + 1
+                   table.insert(indexes, index)
+               end
+           end
+       end
+   end
+
+   for index = 1, #indexes, 1 do
+       local spec = self.data[indexes[index]]
+       local left_iron = building.capacity.iron - building.fetch.iron
+       if left_iron > 0 and spec.iron > 0 then
+           local amount = math.min(left_iron, spec.iron)
+           building.fetch.iron = building.fetch.iron + amount
+           spec.iron = spec.iron - amount
+       end
+       local left_stone = building.capacity.stone - building.fetch.stone
+       if left_stone > 0 and spec.stone > 0 then
+           local amount = math.min(left_stone, spec.stone)
+           building.fetch.stone = building.fetch.stone + amount
+           spec.stone = spec.stone - amount
+       end
+       local left_wood = building.capacity.wood - building.fetch.wood
+       if left_wood > 0 and spec.wood > 0 then
+           local amount = math.min(left_wood, spec.wood)
+           building.fetch.wood = building.fetch.wood + amount
+           spec.wood = spec.wood - amount
+       end
+       if building.fetch.iron == building.capacity.iron and
+           building.fetch.stone == building.capacity.stone and
+           building.fetch.wood == building.capacity.wood then
+           return true
+       end
+   end
+   return false
 end
 
 function Map.make_mask(building, wood, iron, stone)
