@@ -46,7 +46,7 @@ end
 function trade.update(dt)
     trade.update_prices()
     repeat_delay = repeat_delay - dt
-    if love.mouse.isDown() and repeat_delay <= 0 then
+    if love.mouse.isDown(1) and repeat_delay <= 0 then
         trade.check_sliders()
     end
 end
@@ -153,7 +153,7 @@ function trade.keyreleased(key)
 end
 
 function trade.mousepressed (x, y, button, isTouch)
-    repeat_delay = 0.8
+    repeat_delay = 0.4
     trade.check_sliders()
 end
 
@@ -201,7 +201,7 @@ end
 
 function trade.check_sliders()
     local x, y = love.mouse.getPosition()
-    repeat_delay = repeat_delay + 0.2
+    repeat_delay = repeat_delay + 0.1
     local xb = GAME_W / 2 - 290 + 50
     local yb = GAME_H / 2 - 20 - 16
 
@@ -267,24 +267,19 @@ function trade.check_sliders()
     end
     if x >= xb + 90 and x < xb + 122 and y >= yb and y < yb + 32 then
         trading.sell.stone.amount = trading.sell.stone.amount + 10
-        local _, stone, _, _ = trade.compute_transaction()
-        print(stone)
-        if party.stone + stone < 0 then
+        if party.stone - trading.sell.stone.amount < 0 then
             trading.sell.stone.amount = trading.sell.stone.amount - 10
         end
     end
     if x >= xb + 90 and x < xb + 122 and y >= yb + 30 and y < yb + 62 then
         trading.sell.iron.amount = trading.sell.iron.amount + 10
-        local iron, _, _, _ = trade.compute_transaction()
-        print(iron)
-        if party.iron + iron < 0 then
+        if party.iron - trading.sell.iron.amount < 0 then
             trading.sell.iron.amount = trading.sell.iron.amount - 10
         end
     end
     if x >= xb + 90 and x < xb + 122 and y >= yb + 60 and y < yb + 92 then
         trading.sell.wood.amount = trading.sell.wood.amount + 10
-        local _, _, wood, _ = trade.compute_transaction()
-        if party.wood + wood < 0 then
+        if party.wood - trading.sell.wood.amount < 0 then
             trading.sell.wood.amount = trading.sell.wood.amount - 10
         end
     end
