@@ -15,6 +15,7 @@ cursor = {
 }
 
 party = {
+    infinity = true,
     gold = 99100,
     stone = 100,
     iron = 100,
@@ -56,6 +57,7 @@ end
 
 function game.reset_party(file)
     map = Map.load_from_file(file)
+    party.infinity = true
     party.aqueduc = Aqueduc.load_from_file(file)
     map.nodes = astar.prepare(map)
     path = astar.find (1, 1, map.width - 10, map.height -10, map.nodes)
@@ -90,7 +92,7 @@ function game.tic()
     party.wood = party.wood + math.random(90) + 10
     party.iron = party.iron + math.random(90) + 10
     party.stone = party.stone + math.random(90) + 10
-    party.days_left = party.days_left - 1
+    if not party.infinity then party.days_left = party.days_left - 1 end
 end
 
 function game.draw()
@@ -114,7 +116,7 @@ function game.draw()
 end
 
 function game.draw_entities ()
-    if cursor.action ~= 'none' then
+    if cursor.action == 'build' then
         local mouse_x, mouse_y = love.mouse.getPosition()
         map:draw_entity(mouse_x, mouse_y, item_test)
     end
@@ -145,17 +147,30 @@ function game.mousepressed (x, y, button, isTouch)
         if active == game_menu then
             local action_menu = game_menu:mouse_pressed(x, y, button)
             game.update_menu(action_menu)
+        elseif active == map then
+            if cursor.action == 'build_aqueduc' then
+                local index, _, _ = map:get_index(x, y)
+                cursor.action = 'building_aqueduc'
+                cursor.start = map.data[index]
+            elseif cursor.action == 'build' then
+                game.build(x, y)
+            end
         end
-    end
-
-    if active == map and cursor.action == 'build' then
-        game.build()
     end
 end
 
 function game.mousereleased (x, y, button, isTouch)
     mouse.drag = false
     mouse.down = false
+
+    if cursor.action == 'building_aqueduc' then
+        cursor.action = 'none'
+        map.mode_mask = false
+        game_menu:select_menu('aqueduc', false)
+        if #path > 0 then
+            game.build_aqueduc(path)
+        end
+    end
 end
 
 function game.update_menu(action)
@@ -167,9 +182,7 @@ function game.update_menu(action)
     elseif action == 'aqueduc' then
         game_menu:select_menu('aqueduc')
         if game_menu:is_menu_selected('aqueduc') then
-            local index, x_s, y_s = map:get_index(x, y)
             cursor.action = 'build_aqueduc'
-            cursor.start = map.data[index]
             map.mode_mask = true
             map:set_forbiden_mask(true, true, true, true)
         else
@@ -195,8 +208,16 @@ function game.update_menu(action)
     end
 end
 
-function game.build()
-    local mx, my = love.mouse.getPosition()
+function game.build_aqueduc(path)
+    for i, node in ipairs(path) do
+        local inserted = party.aqueduc:insert_node_at(node.x, node.y, 10)
+        if not inserted then
+            break
+        end
+    end
+end
+
+function game.build(mx, my)
     if map:add_entity(mx, my, item_test) then
         party.gold = party.gold - 1000
         if not love.keyboard.isDown('lctrl') then
@@ -219,11 +240,10 @@ function game.mousemoved (x, y, dx, dy, isTouch)
         mouse.drag = true
         if active == map then
             map:set_active_tile(x, y)
-            if cursor.action == 'build_aqueduc' then
+            if cursor.action == 'building_aqueduc' then
                 local _, x1, y1 = map:get_index(mouse.origin.x, mouse.origin.y)
                 local _, x2, y2 = map:get_index(x, y)
-
-                path = astar.find(x1, y1, x2, y2, map.nodes)
+                path = astar.find(x1, y1, x2, y2, map.nodes, true)
             elseif cursor.action == 'none' then
                 map:move_origin(dx, dy)
             end
@@ -249,9 +269,13 @@ end
 
 function game.get_text_icon(icon_name)
     if icon_name == 'days_left' then
-        local unit = ' days'
-        if party.days_left <= 1 then unit = ' day' end
-        return ': ' .. party.days_left .. unit
+        if party.infinity then
+            return ': --'
+        else
+            local unit = ' days'
+            if party.days_left <= 1 then unit = ' day' end
+            return ': ' .. party.days_left .. unit
+        end
     elseif party[icon_name] then
         return ': ' .. party[icon_name]
     else

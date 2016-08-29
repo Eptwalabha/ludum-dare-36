@@ -39,8 +39,18 @@ function Aqueduc.load_from_file(file)
     return aqueduc
 end
 
+function Aqueduc:insert_node_at(x, y, delay)
+    for i, node in ipairs(self.nodes) do
+        if node.x == x and node.y == y then
+            return false
+        end
+    end
+    return self:insert_node(Aqueduc.make_node(x, y, delay))
+end
+
 function Aqueduc:insert_node(node)
     table.insert(self.nodes, node)
+    return true
 end
 
 function Aqueduc.make_node(x, y, delay)

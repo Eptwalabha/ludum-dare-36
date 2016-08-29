@@ -23,7 +23,7 @@ function astar.prepare (maps)
     return nodes
 end
 
-function astar.find (start_x, start_y, goal_x, goal_y, nodes)
+function astar.find (start_x, start_y, goal_x, goal_y, nodes, only_side)
     if start_x == goal_x and start_y == goal_y then
         return {{x = start_x, y = start_y}}
     end
@@ -51,7 +51,7 @@ function astar.find (start_x, start_y, goal_x, goal_y, nodes)
 
         open_set, closed_set = astar.move_from_open_to_close(node, open_set, closed_set)
 
-        local neigbours = astar.get_node_neighbours(node, nodes, closed_set)
+        local neigbours = astar.get_node_neighbours(node, nodes, closed_set, only_side)
 
         for _, neighbor in pairs(neigbours) do
             local G = astar.compute_g(node, neighbor)
@@ -107,13 +107,13 @@ function astar.compute_g (parent, child)
     return parent.G + math.sqrt(dx * dx + dy * dy)
 end
 
-function astar.get_node_neighbours (node, nodes, closed_set)
+function astar.get_node_neighbours (node, nodes, closed_set, only_side)
     local x = node.x
     local y = node.y
     local neigbours = {}
     for i = -1, 1, 1 do
         for j = -1, 1, 1 do
-            if -- (i + j * 3) % 2 ~= 0 and
+            if (not only_side or (only_side and (i + j * 3) % 2 ~= 0)) and
                nodes[x + i] and nodes[x + i][y + j] then
                 if i ~= 0 or j ~= 0 then
                     local n = nodes[x + i][y + j]
