@@ -57,7 +57,7 @@ end
 
 function game.reset_party(file)
     map = Map.load_from_file(file)
-    party.infinity = true
+    party.infinity = false
     party.aqueduc = Aqueduc.load_from_file(file)
     map.nodes = astar.prepare(map)
     path = astar.find (1, 1, map.width - 10, map.height -10, map.nodes)
@@ -66,7 +66,7 @@ function game.reset_party(file)
     party.stone = 999
     party.iron = 999
     party.wood = 999
-    party.day_left = 9999
+    party.days_left = 10
     party.buildings = {}
     next_tic = tic_duration
     active = map
@@ -79,7 +79,7 @@ function game.update(dt)
         next_tic = next_tic + tic_duration
         game.tic()
         if party.days_left < 0 then
-            -- game_over:failure('timeout')
+            game_over:failure('timeout')
         end
     end
 end

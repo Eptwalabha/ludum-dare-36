@@ -351,17 +351,17 @@ end
 
 function trade.update_quotations()
     local nq = 0
-    nq = trading.sell.iron.quotation + math.random(10) - 5
+    nq = trading.sell.iron.quotation + math.random(10) - 3
     if nq < 5 then nq = 5 end
     trading.sell.iron.quotation = nq
     trading.buy.iron.quotation = math.ceil(nq * (math.random(5) / 10 + 1))
 
-    nq = trading.sell.stone.quotation + math.random(10) - 5
+    nq = trading.sell.stone.quotation + math.random(10) - 3
     if nq < 5 then nq = 5 end
     trading.sell.stone.quotation = nq
     trading.buy.stone.quotation = math.ceil(nq * (math.random(5) / 10 + 1))
 
-    nq = trading.sell.wood.quotation + math.random(10) - 5
+    nq = trading.sell.wood.quotation + math.random(10) - 3
     if nq < 5 then nq = 5 end
     trading.sell.wood.quotation = nq
     trading.buy.wood.quotation = math.ceil(nq * (math.random(5) / 10 + 1))

@@ -1,6 +1,7 @@
 require 'game'
 require 'pause'
 require 'trade'
+require 'game_over'
 
 require 'game/map'
 require 'game/game_menu'
@@ -11,6 +12,7 @@ require 'lib/util'
 
 game_states = {
     ['game'] = game,
+    ['game_over'] = game_over,
     ['pause'] = pause,
     ['trade'] = trade
 }
