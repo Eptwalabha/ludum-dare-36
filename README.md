@@ -36,7 +36,7 @@ To have a look at that, switch to branch __ld36__
 
 In order to have a playable game, I should've:
 - Code a way to select the kind of building to build
-- Code all the buildings states
+- Code all the buildings states/infos
 - Display to the player the cost of each construction
 - Created a dozen of different maps
 - Optimize the Pathfinding
@@ -54,8 +54,6 @@ Those are the missing (also optional) features that were initially planned:
 
 ## Screenshots
 
-![capture 1](http://imgur.com/vy1Vq6L)
-
-![capture 2](http://imgur.com/QpzOBpC)
-
-![capture 3](http://imgur.com/bhFAJUl)
+<img src="https://i.imgur.com/vy1Vq6L.png">
+<img src="https://i.imgur.com/QpzOBpC.png">
+<img src="https://i.imgur.com/bhFAJUl.png">
