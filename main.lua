@@ -8,7 +8,7 @@ require 'game/game_menu'
 require 'game/aqueduc'
 
 require 'lib/astar'
-require 'lib/util'
+-- require 'lib/util'
 
 game_states = {
     ['game'] = game,

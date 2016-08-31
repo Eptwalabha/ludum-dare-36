@@ -16,6 +16,16 @@ The construction of an aqueduct's section requires iron, stone and wood which ca
 - [LÖVE2D](https://love2d.org/)
 - [ASEPRITE](https://github.com/aseprite/aseprite)
 
+## How to run (on linux)
+
+In order to run the program, you need to:
+  1. install love2D (>v0.10.1) installed on your machine all instructions can be found on the website [here](https://love2d.org/)
+  2. clone this repository  
+    <code>git clone git@github.com:Eptwalabha/ludum-dare-36.git</code>
+  3. run the commande  
+    <code>love .</code>
+
+
 ## What's been done
 
 - Build map from .PNG image
